@@ -7,84 +7,83 @@ Promisfied wrapper around @sap/hdbext
 With the standard @sap/hdbext you use nested events and callbacks like this:
 
 ```JavaScript
-    let client = req.db;
-		client.prepare(
-			`SELECT SESSION_USER, CURRENT_SCHEMA 
-				             FROM "DUMMY"`,
-			(err, statement) => {
-				if (err) {
-					return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
-				}
-				statement.exec([],
-					(err, results) => {
-						if (err) {
-							return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
-						} else {
-							var result = JSON.stringify({
-								Objects: results
-							});
-							return res.type("application/json").status(200).send(result);
-						}
-					});
-				return null;
-			});
+let client = req.db;
+client.prepare(
+	`SELECT SESSION_USER, CURRENT_SCHEMA 
+	    FROM "DUMMY"`,
+	(err, statement) => {
+		if (err) {
+			return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
+		}
+		statement.exec([], (err, results) => {
+			if (err) {
+				return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
+			} else {
+				var result = JSON.stringify({
+					Objects: results
+				});
+				return res.type("application/json").status(200).send(result);
+			}
+		});
+		return null;
+	});
 ```
 
 However this module wraps the major features of @sap/hdbext in a ES6 class and returns promises. Therefore you could re-write the above block using the easier to read and maintain promise based approach.  You just pass in an instance of the HANA Client @sap/hdbext module. In this example its a typical example that gets the HANA client as Express Middelware (req.db):
 
 ```JavaScript
-    const dbClass = require("sap-hdbext-promisfied")
-		let db = new dbClass(req.db)
-		db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
-				            	 FROM "DUMMY"`)
-			.then(statement => {
-				db.statementExecPromisified(statement, [])
-					.then(results => {
-						let result = JSON.stringify({
-							Objects: results
-						})
-						return res.type("application/json").status(200).send(result)
-					})
-					.catch(err => {
-						return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
-					})
+const dbClass = require("sap-hdbext-promisfied")
+let db = new dbClass(req.db)
+db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
+				            FROM "DUMMY"`)
+	.then(statement => {
+		db.statementExecPromisified(statement, [])
+			.then(results => {
+				let result = JSON.stringify({
+					Objects: results
+				})
+				return res.type("application/json").status(200).send(result)
 			})
 			.catch(err => {
 				return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
 			})
+	})
+	.catch(err => {
+		return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
+	})
 ```
 
 Or better yet if you are running Node.js 8.x or higher you can use the new AWAIT feature and the code is even more streamlined:
 
 ```JavaScript
-    try {
-			const dbClass = require("sap-hdbext-promisfied")
-			let db = new dbClass(req.db);
-			const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
-				            								 FROM "DUMMY"`)
-			const results = await db.statementExecPromisified(statement, [])
-			let result = JSON.stringify({
-				Objects: results
-			})
-			return res.type("application/json").status(200).send(result)
-		} catch (e) {
-			return res.type("text/plain").status(500).send(`ERROR: ${e.toString()}`)
-		}
+try {
+	const dbClass = require("sap-hdbext-promisfied")
+	let db = new dbClass(req.db);
+	const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
+				            							FROM "DUMMY"`)
+	const results = await db.statementExecPromisified(statement, [])
+	let result = JSON.stringify({
+		Objects: results
+	})
+	return res.type("application/json").status(200).send(result)
+} catch (e) {
+	return res.type("text/plain").status(500).send(`ERROR: ${e.toString()}`)
+}
 ```
 
 There are even static helpers to load the HANA connection information from the environment (or local testing file like default-env.json or .env) and create the HANA client for you.  We can adjust the above example for such a scenario:
 
 ```JavaScript
- try {
-        const dbClass = require("sap-hdbext-promisfied")
-        let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
-        const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
+try {
+    const dbClass = require("sap-hdbext-promisfied")
+    let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
+    const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
                                                      FROM "DUMMY"`)
-        const results = await db.statementExecPromisified(statement, [])
-        console.table(results)
-    } catch (e) {
-        console.error(`ERROR: ${err.toString()}`)
-    }
+    const results = await db.statementExecPromisified(statement, [])
+    console.table(results)
+} catch (e) {
+    console.error(`ERROR: ${err.toString()}`)
+}
 ```
 
 ### Methods
