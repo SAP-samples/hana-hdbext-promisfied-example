@@ -1,6 +1,4 @@
-# Title
-
-Promisfied wrapper around @sap/hdbext
+# Promisfied Wrapper around @sap/hdbext
 
 ## Description
 
