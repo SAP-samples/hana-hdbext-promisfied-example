@@ -129,7 +129,7 @@ npm install -g sap-hdbext-promisified
 
 Or you can leverage this module by just listing as requirement in your own project's package.json.
 
-Finally you can clone the repository from [https://github.com/SAP-samples/hana-hdbext-promisified](https://github.com/SAP-samples/hana-hdbext-promisfied) to study the source content and view the consumption examples (test.js)
+Finally you can clone the repository from [https://github.com/SAP-samples/hana-hdbext-promisified-example](https://github.com/SAP-samples/hana-hdbext-promisfied-example) to study the source content and view the consumption examples (test.js)
 
 ## Known Issues
 
