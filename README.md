@@ -115,10 +115,10 @@ objectName(name)
 
 * Install Node.js version 10.x or 12.x on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 
-* Add the SAP Registry to your NPM configuration
+* @sap Node.js packages have moved from https://npm.sap.com to the default registry https://registry.npmjs.org. As future versions of @sap modules are going to be published only there, please make sure to adjust your registry with:
 
 ```shell
-npm config set @sap:registry=https://npm.sap.com
+npm config delete @sap:registry
 ```
 
 * Install the code sample as a reusable Node.js module
