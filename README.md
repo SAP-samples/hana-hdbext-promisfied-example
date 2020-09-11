@@ -124,7 +124,7 @@ npm config delete @sap:registry
 * Install the code sample as a reusable Node.js module
 
 ```shell
-npm install -g sap-hdbext-promisified
+npm install -g sap-hdbext-promisfied
 ```
 
 Or you can leverage this module by just listing as requirement in your own project's package.json.
