@@ -1,5 +1,7 @@
 # Promisfied Wrapper around @sap/hdbext
 
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/hana-hdbext-promisfied-example)](https://api.reuse.software/info/github.com/SAP-samples/hana-hdbext-promisfied-example)
+
 ## Description
 
 With the standard @sap/hdbext you use nested events and callbacks like this:
