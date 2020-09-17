@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: hana-hdbext-promisfied-example
+Upstream-Contact: Thomas Jung <thomas.jung@sap.com>
+Source: https://github.com/sap-samples/hana-hdbext-promisfied-example
+
+Files: *
+Copyright: 2020 SAP SE or an SAP affiliate company and hana-hdbext-promisfied-example contributors
+License: Apache-2.0
