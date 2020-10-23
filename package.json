@@ -1,6 +1,6 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202010.2",
+    "version": "2.202010.3",
     "description": "Promise wrapper for @sap/hdbext",
     "main": "index.js",
     "types": "./@types/index.d.ts",
