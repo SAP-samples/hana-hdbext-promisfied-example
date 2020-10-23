@@ -10,11 +10,16 @@ module.exports = class {
             require('dotenv').config()
             const xsenv = require("@sap/xsenv")
             xsenv.loadEnv(envFile)
+
             let options = ''
-            if (!process.env.TARGET_CONTAINER) {
-                options = xsenv.getServices({ hana: { tag: 'hana' } })
-            } else {
-                options = xsenv.getServices({ hana: { name: process.env.TARGET_CONTAINER } })
+            try {
+                if (!process.env.TARGET_CONTAINER) {
+                    options = xsenv.getServices({ hana: { tag: 'hana' } })
+                } else {
+                    options = xsenv.getServices({ hana: { name: process.env.TARGET_CONTAINER } })
+                }
+            } catch (error) {
+                throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration can be read or processed`);
             }
             var hdbext = require("@sap/hdbext")
             options.hana.pooling = true

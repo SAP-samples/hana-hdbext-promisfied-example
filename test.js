@@ -34,7 +34,7 @@ async function test2() {
                                                      FROM "DUMMY"`)
         const results = await db.statementExecPromisified(statement, [])
         console.table(results)
-    } catch (e) {
+    } catch (err) {
         console.error(`ERROR: ${err.toString()}`)
     }
 }
