@@ -19,7 +19,7 @@ module.exports = class {
                     options = xsenv.getServices({ hana: { name: process.env.TARGET_CONTAINER } })
                 }
             } catch (error) {
-                throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration can be read or processed`);
+                throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration cannot be read or processed`);
             }
             var hdbext = require("@sap/hdbext")
             options.hana.pooling = true
