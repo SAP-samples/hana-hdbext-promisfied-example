@@ -1,6 +1,6 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202101.1",
+    "version": "2.202103.0",
     "description": "Promise wrapper for @sap/hdbext",
     "main": "index.js",
     "types": "./@types/index.d.ts",
@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "dotenv": "^8.2",
-        "@sap/xsenv": "^3.1",
+        "@sap/xsenv": "^3.1.0",
         "@sap/hdbext": "^7.1"
     },
     "devDependencies": {

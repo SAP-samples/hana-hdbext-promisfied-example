@@ -96,10 +96,15 @@ module.exports = class {
         return this.client.promisePrepare(query)
     }
 
+    statementExecBatchPromisified(statement, parameters) {
+        statement.promiseExecBatch = this.util.promisify(statement.execBatch)
+        return statement.promiseExecBatch(parameters)
+    }
+
     statementExecPromisified(statement, parameters) {
         statement.promiseExec = this.util.promisify(statement.exec)
         return statement.promiseExec(parameters)
-    }
+    }    
 
     loadProcedurePromisified(hdbext, schema, procedure) {
         hdbext.promiseLoadProcedure = this.util.promisify(hdbext.loadProcedure)
