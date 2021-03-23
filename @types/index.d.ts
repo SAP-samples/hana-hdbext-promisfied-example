@@ -11,6 +11,7 @@ declare module 'sap-hdbext-promisfied' {
         static schemaCalc(options: Object, db: Object): String
         static objectName(name: String): String
         preparePromisified(query: String): Object
+        statementExecBatchPromisified(statement: Object, parameters:Object): Object
         statementExecPromisified(statement: Object, parameters:Object): Object
         loadProcedurePromisified(hdbext: Object, schema: String, procedure: String): Object
         execSQL(sql: String): Promise<Object>
