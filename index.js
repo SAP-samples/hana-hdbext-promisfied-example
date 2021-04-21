@@ -1,9 +1,9 @@
 /*eslint no-console: 0, no-unused-vars: 0, no-shadow: 0, new-cap: 0, dot-notation:0, no-use-before-define:0 */
 /*eslint-env node, es6 */
 "use strict";
+const debug = require('debug')('hdbext-promisified')
 
 module.exports = class {
-
 
     static createConnectionFromEnv(envFile) {
         return new Promise((resolve, reject) => {
@@ -26,6 +26,7 @@ module.exports = class {
                     throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration can be read or processed`)
                 }
             }
+            debug(`Connection Options`, options)
             var hdbext = require("@sap/hdbext")
             options.hana.pooling = true
             hdbext.createConnection(options.hana, (error, client) => {
@@ -41,7 +42,9 @@ module.exports = class {
     static createConnection(options) {
         return new Promise((resolve, reject) => {
             var hdbext = require("@sap/hdbext")
+
             options.pooling = true
+            debug(`Connection Options`, options)
             hdbext.createConnection(options, (error, client) => {
                 if (error) {
                     reject(error)
@@ -59,6 +62,7 @@ module.exports = class {
             file = 'default-env-admin.json'
         }
         let envFile = path.resolve(process.cwd(), file)
+        debug(`Environment File ${envFile}`)
         return envFile
     }
 
@@ -74,6 +78,7 @@ module.exports = class {
         else {
             schema = options.schema
         }
+        debug(`Schema ${schema}`)
         return schema
     }
 
@@ -93,6 +98,7 @@ module.exports = class {
     }
 
     preparePromisified(query) {
+        debug(`Query:`, query)
         return this.client.promisePrepare(query)
     }
 
@@ -113,7 +119,6 @@ module.exports = class {
 
     execSQL(sql) {
         return new Promise((resolve, reject) => {
-
             this.preparePromisified(sql)
                 .then(statement => {
                     this.statementExecPromisified(statement, [])
