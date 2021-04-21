@@ -18,7 +18,7 @@
         "url": "https://github.com/SAP-samples/hana-hdbext-promisfied-example"
     },
     "dependencies": {
-        "@sap/hdbext": "^7.1.4",
+        "@sap/hdbext": "7.1.4",
         "@sap/xsenv": "^3.1.0",
         "debug": "^4.3.1",
         "dotenv": "^8.2"
