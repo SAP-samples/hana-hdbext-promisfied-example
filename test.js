@@ -1,4 +1,7 @@
-
+// @ts-check
+/**
+ * Test #1
+ */
 async function test1() {
     const dbClass = require('./index')
     let envFile = dbClass.resolveEnv(null)
@@ -26,6 +29,9 @@ async function test1() {
 }
 test1()
 
+/**
+ * Test #2
+ */
 async function test2() {
     try {
         const dbClass = require('./index')

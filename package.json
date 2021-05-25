@@ -1,6 +1,6 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202105.1",
+    "version": "2.202105.2",
     "description": "Promise wrapper for @sap/hdbext",
     "main": "index.js",
     "types": "./@types/index.d.ts",
@@ -21,18 +21,20 @@
         "@sap/hdbext": "7.2.0",
         "@sap/xsenv": "^3.1.0",
         "debug": "^4.3.1",
-        "dotenv": "^9.0"
+        "dotenv": "^10.0"
     },
     "devDependencies": {
+        "@types/node": "^15.6.1",
         "chai": "^4.2.0",
-        "eslint": "^7.26"
+        "eslint": "^7.27"
     },
     "scripts": {
         "start": "node test",
         "lint": "./node_modules/.bin/eslint ./lib",
         "lint-local": "./node_modules/.bin/eslint ./lib --output-file=eslint.log.htm --format=html --fix",
         "validate": "npm run lint && npm run test",
-        "build": "tsc"
+        "build": "tsc",
+        "types": "npx typescript  --declaration --allowJs --emitDeclarationOnly --outDir @types"
     },
     "engines": {
         "node": "^12.0.0 || ^14.0.0"

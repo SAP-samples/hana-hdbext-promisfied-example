@@ -3,8 +3,17 @@
 "use strict";
 const debug = require('debug')('hdbext-promisified')
 
+/**
+ * @module sap-hdbext-promisfied - promises version of sap/hdbext
+ */
+
 module.exports = class {
 
+    /**
+     * Create Database Connection From Environment
+     * @param {string} [envFile] - Override with a specific Environment File 
+     * @returns {Promise<any>} - HANA Client instance of sap/hdbext
+     */
     static createConnectionFromEnv(envFile) {
         return new Promise((resolve, reject) => {
             require('dotenv').config()
@@ -39,6 +48,11 @@ module.exports = class {
         })
     }
 
+    /**
+     * Create Database Connection with specific conneciton options in format expected by sap/hdbext
+     * @param {any} options - Input options or parameters
+     * @returns {Promise<any>} - HANA Client instance of sap/hdbext
+     */
     static createConnection(options) {
         return new Promise((resolve, reject) => {
             var hdbext = require("@sap/hdbext")
@@ -55,6 +69,11 @@ module.exports = class {
         })
     }
 
+    /**
+     * Determine default env file name and lcoation 
+     * @param {any} options - Input options or parameters
+     * @returns string - default env file name and path
+     */
     static resolveEnv(options) {
         let path = require("path")
         let file = 'default-env.json'
@@ -66,6 +85,12 @@ module.exports = class {
         return envFile
     }
 
+    /**
+     * Calcuation the current schema name
+     * @param {any} options - Input options or parameters
+     * @param {any} db - HANA Client instance of sap/hdbext
+     * @returns {Promise<string>} - Schema  
+     */
     static async schemaCalc(options, db) {
         let schema = ''
         if (options.schema === '**CURRENT_SCHEMA**') {
@@ -82,6 +107,11 @@ module.exports = class {
         return schema
     }
 
+    /**
+     * Calcuation Object name from wildcards
+     * @param {string} name - DB object name
+     * @returns {string} - final object name
+     */
     static objectName(name) {
         if (typeof name === "undefined" || name === null || name === '*') {
             name = "%"
@@ -91,32 +121,65 @@ module.exports = class {
         return name
     }
 
+    /**
+     * @constructor
+     * @param {object} client - HANA DB Client instance of type sap/hdbext 
+     */
     constructor(client) {
         this.client = client
         this.util = require("util")
         this.client.promisePrepare = this.util.promisify(this.client.prepare)
     }
 
+    /**
+     * Prepare database statement 
+     * @param {string} query - database query
+     * @returns {any} - prepared statement object
+     */
     preparePromisified(query) {
         debug(`Query:`, query)
         return this.client.promisePrepare(query)
     }
 
+    /**
+     * Execute DB Statement in Batch
+     * @param {any} statement - prepared statement object
+     * @param {any} parameters - query parameters
+     * @returns {Promise<any>} - resultset 
+     */
     statementExecBatchPromisified(statement, parameters) {
         statement.promiseExecBatch = this.util.promisify(statement.execBatch)
         return statement.promiseExecBatch(parameters)
     }
 
+    /**
+     * Execute DB Statement 
+     * @param {any} statement - prepared statement object
+     * @param {any} parameters - query parameters
+     * @returns {Promise<any>} - resultset 
+     */
     statementExecPromisified(statement, parameters) {
         statement.promiseExec = this.util.promisify(statement.exec)
         return statement.promiseExec(parameters)
     }    
 
+    /**
+     * Load stored procedure and return proxy function
+     * @param {any} hdbext - instance of db client sap/hdbext
+     * @param {string} schema - Schema name can be null
+     * @param {string} procedure - DB procedure name
+     * @returns {Promise<function>} - proxy function
+     */
     loadProcedurePromisified(hdbext, schema, procedure) {
         hdbext.promiseLoadProcedure = this.util.promisify(hdbext.loadProcedure)
         return hdbext.promiseLoadProcedure(this.client, schema, procedure)
     }
 
+    /**
+     * Execute single SQL Statement and directly return result set
+     * @param {string} sql - SQL Statement
+     * @returns {Promise<any>} - result set object
+     */
     execSQL(sql) {
         return new Promise((resolve, reject) => {
             this.preparePromisified(sql)
@@ -135,6 +198,12 @@ module.exports = class {
         })
     }
 
+    /**
+     * Call Database Procedure
+     * @param {function} storedProc - stored procedure proxy function
+     * @param {any} inputParams - input parameters for the stored procedure
+     * @returns 
+     */
     callProcedurePromisified(storedProc, inputParams) {
         return new Promise((resolve, reject) => {
             storedProc(inputParams, (error, outputScalar, ...results) => {
