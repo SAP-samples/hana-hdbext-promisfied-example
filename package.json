@@ -1,6 +1,6 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202105.2",
+    "version": "2.202107.1",
     "description": "Promise wrapper for @sap/hdbext",
     "main": "index.js",
     "types": "./@types/index.d.ts",
@@ -18,15 +18,15 @@
         "url": "https://github.com/SAP-samples/hana-hdbext-promisfied-example"
     },
     "dependencies": {
-        "@sap/hdbext": "7.2.0",
-        "@sap/xsenv": "^3.1.0",
-        "debug": "^4.3.1",
+        "@sap/hdbext": "^7.3.0",
+        "@sap/xsenv": "^3.1.1",
+        "debug": "^4.3.2",
         "dotenv": "^10.0"
     },
     "devDependencies": {
-        "@types/node": "^15.6.1",
+        "@types/node": "^16.4.0",
         "chai": "^4.2.0",
-        "eslint": "^7.27"
+        "eslint": "^7.31"
     },
     "scripts": {
         "start": "node test",
