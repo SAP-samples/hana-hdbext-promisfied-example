@@ -4,7 +4,7 @@
  */
 async function test1() {
     // @ts-ignore
-    const dbClass = require('sap-hdbext-promisfied')
+    const dbClass = require('./index.cjs')
     let envFile = dbClass.resolveEnv(null)
     dbClass.createConnectionFromEnv(envFile)
         .then(client => {
@@ -36,7 +36,7 @@ test1()
 async function test2() {
     try {
         // @ts-ignore
-        const dbClass = require('sap-hdbext-promisfied')
+        const dbClass = require('./index.cjs')
         let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
         const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
                                                      FROM "DUMMY"`)
