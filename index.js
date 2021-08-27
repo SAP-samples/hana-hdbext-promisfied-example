@@ -173,8 +173,8 @@ export default class dbClass {
      * @returns {Promise<function>} - proxy function
      */
     loadProcedurePromisified(hdbext, schema, procedure) {
-        hdbext.promiseLoadProcedure = promisify(hdbext.loadProcedure)
-        return hdbext.promiseLoadProcedure(this.client, schema, procedure)
+        let promiseLoadProcedure = promisify(hdbext.loadProcedure)
+        return promiseLoadProcedure(this.client, schema, procedure)
     }
 
     /**

@@ -1,6 +1,8 @@
 // @ts-check
 
 import dbClass from './index.js'
+import * as hdbext from '@sap/hdbext'
+
 /**
  * Test #1
  */
@@ -46,3 +48,20 @@ export async function test2() {
     }
 }
 test2()
+
+
+/**
+ * Test #3
+ */
+ export async function test3() {
+    try {
+        let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
+        let sp = await db.loadProcedurePromisified(hdbext, 'SYS', 'IS_VALID_PASSWORD')
+        let output = await db.callProcedurePromisified(sp, {PASSWORD: "TEST"})
+
+        console.table(output)
+    } catch (err) {
+        console.error(`ERROR: ${err.toString()}`)
+    }
+}
+test3()

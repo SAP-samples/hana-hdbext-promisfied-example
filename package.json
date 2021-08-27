@@ -1,6 +1,6 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202108.2",
+    "version": "2.202108.3",
     "description": "Promise wrapper for @sap/hdbext",
     "main": "./index.cjs",
     "exports": {
