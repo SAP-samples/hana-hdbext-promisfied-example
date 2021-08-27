@@ -1,6 +1,8 @@
-/// <reference types="node" />
-export = exports;
-declare class exports {
+export const debug: any;
+/**
+ * @module sap-hdbext-promisfied - promises version of sap/hdbext
+ */
+export default class dbClass {
     /**
      * Create Database Connection From Environment
      * @param {string} [envFile] - Override with a specific Environment File
@@ -38,7 +40,6 @@ declare class exports {
      */
     constructor(client: object);
     client: any;
-    util: typeof import("util");
     /**
      * Prepare database statement
      * @param {string} query - database query

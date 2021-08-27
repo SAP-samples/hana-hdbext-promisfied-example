@@ -1,8 +1,20 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202108.1",
+    "version": "2.202108.2",
     "description": "Promise wrapper for @sap/hdbext",
-    "main": "index.js",
+    "main": "./index.cjs",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": [
+            {
+                "import": "./index.js",
+                "require": "./index.cjs"
+            },
+            "./index.cjs"
+        ]
+    },
+    "type": "module",
+    "module": "./index.js",
     "types": "./@types/index.d.ts",
     "keywords": [
         "promise",

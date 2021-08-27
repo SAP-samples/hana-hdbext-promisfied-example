@@ -1,20 +1,14 @@
 /*eslint no-console: 0, no-unused-vars: 0, no-shadow: 0, new-cap: 0, dot-notation:0, no-use-before-define:0 */
 /*eslint-env node, es6 */
 // @ts-check
-
-import debugModule from 'debug'
-export const debug = new debugModule('hdbext-promisified')
-import * as dotenv from 'dotenv'
-import * as xsenv from '@sap/xsenv'
-import * as hdbext from '@sap/hdbext'
-import * as path from 'path'
-import { promisify } from 'util'
+"use strict";
+const debug = require('debug')('hdbext-promisified')
 
 /**
  * @module sap-hdbext-promisfied - promises version of sap/hdbext
  */
 
-export default class dbClass {
+module.exports = class {
 
     /**
      * Create Database Connection From Environment
@@ -23,7 +17,8 @@ export default class dbClass {
      */
     static createConnectionFromEnv(envFile) {
         return new Promise((resolve, reject) => {
-            dotenv.config()
+            require('dotenv').config()
+            const xsenv = require("@sap/xsenv")
             xsenv.loadEnv(envFile)
 
             /** @type any */
@@ -43,6 +38,7 @@ export default class dbClass {
                 }
             }
             debug(`Connection Options`, options)
+            var hdbext = require("@sap/hdbext")
             options.hana.pooling = true
             hdbext.createConnection(options.hana, (error, client) => {
                 if (error) {
@@ -61,6 +57,8 @@ export default class dbClass {
      */
     static createConnection(options) {
         return new Promise((resolve, reject) => {
+            var hdbext = require("@sap/hdbext")
+
             options.pooling = true
             debug(`Connection Options`, options)
             hdbext.createConnection(options, (error, client) => {
@@ -79,6 +77,7 @@ export default class dbClass {
      * @returns string - default env file name and path
      */
     static resolveEnv(options) {
+        let path = require("path")
         let file = 'default-env.json'
         if (options && options.hasOwnProperty('admin') && options.admin) {
             file = 'default-env-admin.json'
@@ -130,7 +129,8 @@ export default class dbClass {
      */
     constructor(client) {
         this.client = client
-        this.client.promisePrepare = promisify(this.client.prepare)
+        this.util = require("util")
+        this.client.promisePrepare = this.util.promisify(this.client.prepare)
     }
 
     /**
@@ -150,7 +150,7 @@ export default class dbClass {
      * @returns {Promise<any>} - resultset 
      */
     statementExecBatchPromisified(statement, parameters) {
-        statement.promiseExecBatch = promisify(statement.execBatch)
+        statement.promiseExecBatch = this.util.promisify(statement.execBatch)
         return statement.promiseExecBatch(parameters)
     }
 
@@ -161,7 +161,7 @@ export default class dbClass {
      * @returns {Promise<any>} - resultset 
      */
     statementExecPromisified(statement, parameters) {
-        statement.promiseExec = promisify(statement.exec)
+        statement.promiseExec = this.util.promisify(statement.exec)
         return statement.promiseExec(parameters)
     }    
 
@@ -173,7 +173,7 @@ export default class dbClass {
      * @returns {Promise<function>} - proxy function
      */
     loadProcedurePromisified(hdbext, schema, procedure) {
-        hdbext.promiseLoadProcedure = promisify(hdbext.loadProcedure)
+        hdbext.promiseLoadProcedure = this.util.promisify(hdbext.loadProcedure)
         return hdbext.promiseLoadProcedure(this.client, schema, procedure)
     }
 
