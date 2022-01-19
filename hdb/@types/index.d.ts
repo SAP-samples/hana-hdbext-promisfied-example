@@ -8,7 +8,7 @@ export default class dbClass {
      * @param {string} [envFile] - Override with a specific Environment File
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
-    static createConnectionFromEnv(envFile?: string | undefined): Promise<any>;
+    static createConnectionFromEnv(envFile?: string): Promise<any>;
     /**
      * Create Database Connection with specific conneciton options in format expected by hdb
      * @param {any} options - Input options or parameters
@@ -46,7 +46,7 @@ export default class dbClass {
      * @param {object} client - HANA DB Client instance of type hdb
      */
     constructor(client: object);
-    client: object;
+    client: any;
     /**
      * Destroy Client
      */

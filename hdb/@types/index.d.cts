@@ -4,13 +4,13 @@ declare class exports {
     /**
      * Create Database Connection From Environment
      * @param {string} [envFile] - Override with a specific Environment File
-     * @returns {Promise<any>} - HANA Client instance of sap/hdbext
+     * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static createConnectionFromEnv(envFile?: string): Promise<any>;
     /**
-     * Create Database Connection with specific conneciton options in format expected by sap/hdbext
+     * Create Database Connection with specific conneciton options in format expected by hdb
      * @param {any} options - Input options or parameters
-     * @returns {Promise<any>} - HANA Client instance of sap/hdbext
+     * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static createConnection(options: any): Promise<any>;
     /**
@@ -20,13 +20,6 @@ declare class exports {
      */
     static resolveEnv(options: any): string;
     /**
-     * Calcuation the current schema name
-     * @param {any} options - Input options or parameters
-     * @param {any} db - HANA Client instance of sap/hdbext
-     * @returns {Promise<string>} - Schema
-     */
-    static schemaCalc(options: any, db: any): Promise<string>;
-    /**
      * Calcuation Object name from wildcards
      * @param {string} name - DB object name
      * @returns {string} - final object name
@@ -34,11 +27,33 @@ declare class exports {
     static objectName(name: string): string;
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type sap/hdbext
+     * @param {object} client - HANA DB Client instance of type hdb
      */
     constructor(client: object);
+    /**
+     * Calcuation the current schema name
+     * @param {any} options - Input options or parameters
+     * @param {any} db - HANA Client instance of hdb
+     * @returns {Promise<string>} - Schema
+     */
+    schemaCalc(options: any, db: any): Promise<string>;
+    /**
+     * Load Metadata of a Stored Procedure
+     * @param {any} db - HANA Client instance of hdb
+     * @param {any} procInfo - Details of Schmea/Stored Procedure to Lookup
+     * @returns {Promise<any>} - Result Set
+     */
+    fetchSPMetadata(db: any, procInfo: any): Promise<any>;
     client: any;
     util: typeof import("util");
+    /**
+     * Destroy Client
+     */
+    destroyClient(): void;
+    /**
+     * Destroy Client
+     */
+    validateClient(): boolean;
     /**
      * Prepare database statement
      * @param {string} query - database query
@@ -61,12 +76,11 @@ declare class exports {
     statementExecPromisified(statement: any, parameters: any): Promise<any>;
     /**
      * Load stored procedure and return proxy function
-     * @param {any} hdbext - instance of db client sap/hdbext
      * @param {string} schema - Schema name can be null
      * @param {string} procedure - DB procedure name
      * @returns {Promise<function>} - proxy function
      */
-    loadProcedurePromisified(hdbext: any, schema: string, procedure: string): Promise<Function>;
+    loadProcedurePromisified(schema: string, procedure: string): Promise<Function>;
     /**
      * Execute single SQL Statement and directly return result set
      * @param {string} sql - SQL Statement
@@ -75,9 +89,9 @@ declare class exports {
     execSQL(sql: string): Promise<any>;
     /**
      * Call Database Procedure
-     * @param {function} storedProc - stored procedure proxy function
+     * @param {any} storedProc - stored procedure proxy function
      * @param {any} inputParams - input parameters for the stored procedure
      * @returns
      */
-    callProcedurePromisified(storedProc: Function, inputParams: any): Promise<any>;
+    callProcedurePromisified(storedProc: any, inputParams: any): Promise<any>;
 }

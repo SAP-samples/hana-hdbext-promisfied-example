@@ -1,15 +1,20 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202201.3",
+    "version": "2.202201.4",
     "description": "Promise wrapper for hdb without any depenency to @sap/hana-client",
-    "main": "dist/cjs/index.js",
-    "module": "dist/mjs/index.js",
+    "main": "./index.cjs",
     "exports": {
-        ".": {
-            "import": "./dist/mjs/index.js",
-            "require": "./dist/cjs/index.js"
-        }
+        "./package.json": "./package.json",
+        ".": [
+            {
+                "import": "./index.js",
+                "require": "./index.cjs"
+            },
+            "./index.cjs"
+        ]
     },
+    "type": "module",
+    "module": "./index.js",
     "types": "./@types/index.d.ts",
     "keywords": [
         "promise",
@@ -42,7 +47,6 @@
         "lint": "./node_modules/.bin/eslint ./lib",
         "lint-local": "./node_modules/.bin/eslint ./lib --output-file=eslint.log.htm --format=html --fix",
         "validate": "npm run lint && npm run test",
-        "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig-cjs.json && ./fixup",
         "types": "tsc  --declaration --allowJs --emitDeclarationOnly --outDir @types",
         "prodinstall": "npm install --only=prod"
     },
