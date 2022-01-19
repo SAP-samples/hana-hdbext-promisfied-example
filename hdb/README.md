@@ -4,7 +4,7 @@
 
 ## Description
 
-With the standard @sap/hdbext you use nested events and callbacks like this:
+With the standard hdb module you use nested events and callbacks like this:
 
 ```JavaScript
 let client = req.db;
@@ -29,10 +29,10 @@ client.prepare(
 	});
 ```
 
-However this module wraps the major features of @sap/hdbext in a ES6 class and returns promises. Therefore you could re-write the above block using the easier to read and maintain promise based approach.  You just pass in an instance of the HANA Client @sap/hdbext module. In this example its a typical example that gets the HANA client as Express Middelware (req.db):
+However this module wraps the major features of hdb module in a ES6 class and returns promises. Therefore you could re-write the above block using the easier to read and maintain promise based approach.  You just pass in an instance of the HANA Client @sap/hdbext module. In this example its a typical example that gets the HANA client as Express Middelware (req.db):
 
 ```JavaScript
-const dbClass = require("sap-hdbext-promisfied")
+const dbClass = require("sap-hdb-promisfied")
 let db = new dbClass(req.db)
 db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
 				            FROM "DUMMY"`)
@@ -57,7 +57,7 @@ Or better yet if you are running Node.js 8.x or higher you can use the new AWAIT
 
 ```JavaScript
 try {
-	const dbClass = require("sap-hdbext-promisfied")
+	const dbClass = require("sap-hdb-promisfied")
 	let db = new dbClass(req.db);
 	const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
 				            							FROM "DUMMY"`)
@@ -75,20 +75,21 @@ There are even static helpers to load the HANA connection information from the e
 
 ```JavaScript
 try {
-    const dbClass = require("sap-hdbext-promisfied")
-    let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
-    const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
+	    import dbClass from 'sap-hdb-promisfied'
+        let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
+        const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
                                                      FROM "DUMMY"`)
-    const results = await db.statementExecPromisified(statement, [])
-    console.table(results)
-} catch (e) {
-    console.error(`ERROR: ${err.toString()}`)
-}
+        const results = await db.statementExecPromisified(statement, [])
+        console.table(results)
+        db.destroyClient()
+    } catch (/** @type {any} */ err) {
+        console.error(`ERROR: ${err.toString()}`)
+    }
 ```
 
 ### Methods
 
-The following @sap/hdbext functions are exposed as promise-based methods
+The following hdb functions are exposed as promise-based methods
 
 ```JavaScript
 prepare = preparePromisified(query)
@@ -115,18 +116,12 @@ objectName(name)
 
 ## Requirements / Download and Installation
 
-* Install Node.js version 12.x or 14.x on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
-
-* @sap Node.js packages have moved from https://npm.sap.com to the default registry https://registry.npmjs.org. As future versions of @sap modules are going to be published only there, please make sure to adjust your registry with:
-
-```shell
-npm config delete @sap:registry
-```
+* Install any supported version of Node.js on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 
 * Install the code sample as a reusable Node.js module
 
 ```shell
-npm install -g sap-hdbext-promisfied
+npm install -g sap-hdb-promisfied
 ```
 
 Or you can leverage this module by just listing as requirement in your own project's package.json.
