@@ -10,25 +10,25 @@ export async function test1() {
 
     let envFile = dbClass.resolveEnv(null)
     dbClass.createConnectionFromEnv(envFile)
-        .then(client => {
+        .then((/** @type {any} */ client) => {
             let db = new dbClass(client)
             db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
                              FROM "DUMMY"`)
-                .then(statement => {
+                .then((/** @type {any} */ statement) => {
                     db.statementExecPromisified(statement, [])
-                        .then(results => {
+                        .then(/** @type {any} */ (/** @type {any} */ results) => {
                             console.table(results)
                             db.destroyClient()
                         })
-                        .catch(err => {
+                        .catch(/** @type {any} */ (/** @type {{ toString: () => any; }} */ err) => {
                             console.error(`ERROR: ${err.toString()}`)
                         })
                 })
-                .catch(err => {
+                .catch((/** @type {{ toString: () => any; }} */ err) => {
                     console.error(`ERROR: ${err.toString()}`)
                 })
         })
-        .catch(err => {
+        .catch((/** @type {{ toString: () => any; }} */ err) => {
             console.error(`ERROR: ${err.toString()}`)
         })
 }
@@ -45,7 +45,7 @@ export async function test2() {
         const results = await db.statementExecPromisified(statement, [])
         console.table(results)
         db.destroyClient()
-    } catch (err) {
+    } catch (/** @type {any} */ err) {
         console.error(`ERROR: ${err.toString()}`)
     }
 }
@@ -60,7 +60,7 @@ test2()
         let schema = await dbClass.schemaCalc({schema: '**CURRENT_SCHEMA**'}, db)
         console.log(`Current Schema: ${schema}`)
         db.destroyClient()
-    } catch (err) {
+    } catch (/** @type {any} */ err) {
         console.error(`ERROR: ${err.toString()}`)
     }
 }
@@ -76,7 +76,7 @@ test2_1()
         const results = await db.statementExecPromisified(statement, ['SYS'])
         console.table(results)
         db.destroyClient()
-    } catch (err) {
+    } catch (/** @type {any} */ err) {
         console.error(`ERROR: ${err.toString()}`)
     }
 }
@@ -93,7 +93,7 @@ test2_2()
 
         console.table(output)
         db.destroyClient()
-    } catch (err) {
+    } catch (/** @type {any} */ err) {
         console.error(`ERROR: ${err.toString()}`)
     }
 }

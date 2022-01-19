@@ -1,24 +1,31 @@
 /*eslint no-console: 0, no-unused-vars: 0, no-shadow: 0, new-cap: 0, dot-notation:0, no-use-before-define:0 */
 /*eslint-env node, es6 */
 // @ts-check
-"use strict";
-const debug = require('debug')('hdb-promisified')
+
+import debugModule from 'debug'
+// @ts-ignore
+export const debug = new debugModule('hdb-promisified')
+import * as dotenv from 'dotenv'
+import * as xsenv from '@sap/xsenv'
+// @ts-ignore
+import * as hdb from 'hdb'
+import * as path from 'path'
+import { promisify } from 'util'
 
 /**
- * @module sap-hdbext-promisfied - promises version of sap/hdbext
+ * @module sap-hdb-promisfied - promises version of hdb
  */
 
-module.exports = class {
+export default class dbClass {
 
     /**
      * Create Database Connection From Environment
      * @param {string} [envFile] - Override with a specific Environment File 
-     * @returns {Promise<any>} - HANA Client instance of sap/hdbext
+     * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static createConnectionFromEnv(envFile) {
         return new Promise((resolve, reject) => {
-            require('dotenv').config()
-            const xsenv = require("@sap/xsenv")
+            dotenv.config()
             xsenv.loadEnv(envFile)
 
             /** @type any */
@@ -38,35 +45,39 @@ module.exports = class {
                 }
             }
             debug(`Connection Options`, options)
-            var hdbext = require("@sap/hdbext")
-            options.hana.pooling = true
-            hdbext.createConnection(options.hana, (error, client) => {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve(client)
+            let client = hdb.createClient(options.hana)
+            client.on('error', (/** @type {any} */ err) => {
+                console.log(`In Client On Error`)
+                reject(err)
+            })
+            debug(`Client Ready State`, client.readyState)
+
+            client.connect((/** @type {any} */ err) => {
+                if (err) {
+                    reject(err)
                 }
+                resolve(client)
             })
         })
     }
 
     /**
-     * Create Database Connection with specific conneciton options in format expected by sap/hdbext
+     * Create Database Connection with specific conneciton options in format expected by hdb
      * @param {any} options - Input options or parameters
-     * @returns {Promise<any>} - HANA Client instance of sap/hdbext
+     * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static createConnection(options) {
         return new Promise((resolve, reject) => {
-            var hdbext = require("@sap/hdbext")
-
-            options.pooling = true
             debug(`Connection Options`, options)
-            hdbext.createConnection(options, (error, client) => {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve(client)
+            let client = hdb.createClient(options.hana)
+            client.on('error', (/** @type {any} */ err) => {
+                reject(err)
+            })
+            client.connect((/** @type {any} */ err) => {
+                if (err) {
+                    reject(err)
                 }
+                resolve(client)
             })
         })
     }
@@ -77,7 +88,6 @@ module.exports = class {
      * @returns string - default env file name and path
      */
     static resolveEnv(options) {
-        let path = require("path")
         let file = 'default-env.json'
         if (options && options.hasOwnProperty('admin') && options.admin) {
             file = 'default-env-admin.json'
@@ -90,7 +100,7 @@ module.exports = class {
     /**
      * Calcuation the current schema name
      * @param {any} options - Input options or parameters
-     * @param {any} db - HANA Client instance of sap/hdbext
+     * @param {any} db - HANA Client instance of hdb
      * @returns {Promise<string>} - Schema  
      */
     static async schemaCalc(options, db) {
@@ -110,6 +120,34 @@ module.exports = class {
     }
 
     /**
+     * Load Metadata of a Stored Procedure
+     * @param {any} db - HANA Client instance of hdb
+     * @param {any} procInfo - Details of Schmea/Stored Procedure to Lookup
+     * @returns {Promise<any>} - Result Set  
+     */    
+    static async fetchSPMetadata(db, procInfo) {
+        var sqlProcedureMetadata = "SELECT \
+          PARAMS.PARAMETER_NAME,           \
+          PARAMS.DATA_TYPE_NAME,           \
+          PARAMS.PARAMETER_TYPE,           \
+          PARAMS.HAS_DEFAULT_VALUE,        \
+          PARAMS.IS_INPLACE_TYPE,          \
+          PARAMS.TABLE_TYPE_SCHEMA,        \
+          PARAMS.TABLE_TYPE_NAME,          \
+                                           \
+          CASE WHEN SYNONYMS.OBJECT_NAME IS NULL THEN 'FALSE' ELSE 'TRUE' END AS IS_TABLE_TYPE_SYNONYM,         \
+          IFNULL(SYNONYMS.OBJECT_SCHEMA, '') AS OBJECT_SCHEMA,                                                  \
+          IFNULL(SYNONYMS.OBJECT_NAME, '') AS OBJECT_NAME                                                       \
+                                                                                                                \
+          FROM SYS.PROCEDURE_PARAMETERS AS PARAMS                                                               \
+          LEFT JOIN SYS.SYNONYMS AS SYNONYMS                                                                    \
+          ON SYNONYMS.SCHEMA_NAME = PARAMS.TABLE_TYPE_SCHEMA AND SYNONYMS.SYNONYM_NAME = PARAMS.TABLE_TYPE_NAME \
+          WHERE PARAMS.SCHEMA_NAME = ? AND PARAMS.PROCEDURE_NAME = ?                                            \
+          ORDER BY PARAMS.POSITION"
+        return await db.statementExecPromisified(await db.preparePromisified(sqlProcedureMetadata), [procInfo.schema, procInfo.name])
+      }
+
+    /**
      * Calcuation Object name from wildcards
      * @param {string} name - DB object name
      * @returns {string} - final object name
@@ -125,12 +163,31 @@ module.exports = class {
 
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type sap/hdbext 
+     * @param {object} client - HANA DB Client instance of type hdb
      */
     constructor(client) {
         this.client = client
-        this.util = require("util")
-        this.client.promisePrepare = this.util.promisify(this.client.prepare)
+        // @ts-ignore
+        this.client.promisePrepare = promisify(this.client.prepare)
+    }
+
+    /**
+     * Destroy Client 
+     */
+    destroyClient() {
+        // @ts-ignore
+        if (!this.client.hadError && this.client.readyState !== 'closed') {
+            // @ts-ignore
+            this.client.end()
+        }
+    }
+
+    /**
+     * Destroy Client 
+     */
+    validateClient() {
+        // @ts-ignore
+        return (!this.client.hadError && this.client.readyState === 'connected')
     }
 
     /**
@@ -140,6 +197,7 @@ module.exports = class {
      */
     preparePromisified(query) {
         debug(`Query:`, query)
+        // @ts-ignore
         return this.client.promisePrepare(query)
     }
 
@@ -150,7 +208,7 @@ module.exports = class {
      * @returns {Promise<any>} - resultset 
      */
     statementExecBatchPromisified(statement, parameters) {
-        statement.promiseExecBatch = this.util.promisify(statement.execBatch)
+        statement.promiseExecBatch = promisify(statement.execBatch)
         return statement.promiseExecBatch(parameters)
     }
 
@@ -161,21 +219,33 @@ module.exports = class {
      * @returns {Promise<any>} - resultset 
      */
     statementExecPromisified(statement, parameters) {
-        statement.promiseExec = this.util.promisify(statement.exec)
+        statement.promiseExec = promisify(statement.exec)
         return statement.promiseExec(parameters)
-    }    
+    }
 
     /**
      * Load stored procedure and return proxy function
-     * @param {any} hdbext - instance of db client sap/hdbext
      * @param {string} schema - Schema name can be null
      * @param {string} procedure - DB procedure name
      * @returns {Promise<function>} - proxy function
      */
-    loadProcedurePromisified(hdbext, schema, procedure) {
-        hdbext.promiseLoadProcedure = this.util.promisify(hdbext.loadProcedure)
-        return hdbext.promiseLoadProcedure(this.client, schema, procedure)
+    async loadProcedurePromisified(schema, procedure) {
+        if(!schema){
+           schema = await dbClass.schemaCalc({schema: '**CURRENT_SCHEMA**'}, this)
+        }
+        let procedureMetaData = await dbClass.fetchSPMetadata(this, {schema: schema, name: procedure})
+        let callString = ''
+        procedureMetaData.forEach(() => {
+            if(callString === ''){
+                callString += `?`
+            }else {
+                callString += `,?`
+            }
+          })
+
+        return this.preparePromisified(`CALL ${schema}.${procedure}(${callString})`)
     }
+
 
     /**
      * Execute single SQL Statement and directly return result set
@@ -185,7 +255,7 @@ module.exports = class {
     execSQL(sql) {
         return new Promise((resolve, reject) => {
             this.preparePromisified(sql)
-                .then(statement => {
+                .then((/** @type {any} */ statement) => {
                     this.statementExecPromisified(statement, [])
                         .then(results => {
                             resolve(results)
@@ -194,7 +264,7 @@ module.exports = class {
                             reject(err)
                         });
                 })
-                .catch(err => {
+                .catch((/** @type {any} */ err) => {
                     reject(err)
                 })
         })
@@ -202,13 +272,16 @@ module.exports = class {
 
     /**
      * Call Database Procedure
-     * @param {function} storedProc - stored procedure proxy function
+     * @param {any} storedProc - stored procedure proxy function
      * @param {any} inputParams - input parameters for the stored procedure
      * @returns 
      */
     callProcedurePromisified(storedProc, inputParams) {
         return new Promise((resolve, reject) => {
-            storedProc(inputParams, (error, outputScalar, ...results) => {
+            // @ts-ignore
+            storedProc.exec(inputParams, (/** @type {any} */ error, /** @type {any} */ outputScalar, /** @type {string | any[]} */ ...results) => {
+                 
+           // storedProc(inputParams, (error, outputScalar, ...results) => {
                 if (error) {
                     reject(error)
                 } else {
@@ -221,6 +294,7 @@ module.exports = class {
                         let output = {};
                         output.outputScalar = outputScalar;
                         for (let i = 0; i < results.length; i++) {
+                            // @ts-ignore
                             output[`results${i}`] = results[i]
                         }
                         resolve(output)
@@ -231,3 +305,4 @@ module.exports = class {
     }
 
 }
+

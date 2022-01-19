@@ -1,65 +1,62 @@
 /*eslint no-console: 0, no-unused-vars: 0, no-shadow: 0, new-cap: 0, dot-notation:0, no-use-before-define:0 */
 /*eslint-env node, es6 */
 // @ts-check
-
-import debugModule from 'debug'
-export const debug = new debugModule('hdb-promisified')
-import * as dotenv from 'dotenv'
-import * as xsenv from '@sap/xsenv'
-import * as hdb from 'hdb'
-import * as path from 'path'
-import { promisify } from 'util'
-import { Console } from 'console'
-
+import debugModule from 'debug';
+// @ts-ignore
+export const debug = new debugModule('hdb-promisified');
+import * as dotenv from 'dotenv';
+import * as xsenv from '@sap/xsenv';
+// @ts-ignore
+import * as hdb from 'hdb';
+import * as path from 'path';
+import { promisify } from 'util';
 /**
  * @module sap-hdb-promisfied - promises version of hdb
  */
-
 export default class dbClass {
-
     /**
      * Create Database Connection From Environment
-     * @param {string} [envFile] - Override with a specific Environment File 
+     * @param {string} [envFile] - Override with a specific Environment File
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static createConnectionFromEnv(envFile) {
         return new Promise((resolve, reject) => {
-            dotenv.config()
-            xsenv.loadEnv(envFile)
-
+            dotenv.config();
+            xsenv.loadEnv(envFile);
             /** @type any */
-            let options = ''
+            let options = '';
             try {
                 if (!process.env.TARGET_CONTAINER) {
-                    options = xsenv.getServices({ hana: { tag: 'hana' } })
-                } else {
-                    options = xsenv.getServices({ hana: { name: process.env.TARGET_CONTAINER } })
+                    options = xsenv.getServices({ hana: { tag: 'hana' } });
                 }
-            } catch (error) {
-                try {
-                    options = xsenv.getServices({ hana: { tag: 'hana', plan: "hdi-shared" } })
-                } catch (error) {
-                    console.error(error)
-                    throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration can be read or processed`)
+                else {
+                    options = xsenv.getServices({ hana: { name: process.env.TARGET_CONTAINER } });
                 }
             }
-            debug(`Connection Options`, options)
-            let client = hdb.createClient(options.hana)
-            client.on('error', (err) => {
-                console.log(`In Client On Error`)
-                reject(err)
-            })
-            debug(`Client Ready State`, client.readyState)
-
-            client.connect((err) => {
-                if (err) {
-                    reject(err)
+            catch (error) {
+                try {
+                    options = xsenv.getServices({ hana: { tag: 'hana', plan: "hdi-shared" } });
                 }
-                resolve(client)
-            })
-        })
+                catch (error) {
+                    console.error(error);
+                    throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration can be read or processed`);
+                }
+            }
+            debug(`Connection Options`, options);
+            let client = hdb.createClient(options.hana);
+            client.on('error', (/** @type {any} */ err) => {
+                console.log(`In Client On Error`);
+                reject(err);
+            });
+            debug(`Client Ready State`, client.readyState);
+            client.connect((/** @type {any} */ err) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(client);
+            });
+        });
     }
-
     /**
      * Create Database Connection with specific conneciton options in format expected by hdb
      * @param {any} options - Input options or parameters
@@ -67,63 +64,60 @@ export default class dbClass {
      */
     static createConnection(options) {
         return new Promise((resolve, reject) => {
-            debug(`Connection Options`, options)
-            let client = hdb.createClient(options.hana)
-            client.on('error', (err) => {
-                reject(err)
-            })
-            client.connect((err) => {
+            debug(`Connection Options`, options);
+            let client = hdb.createClient(options.hana);
+            client.on('error', (/** @type {any} */ err) => {
+                reject(err);
+            });
+            client.connect((/** @type {any} */ err) => {
                 if (err) {
-                    reject(err)
+                    reject(err);
                 }
-                resolve(client)
-            })
-        })
+                resolve(client);
+            });
+        });
     }
-
     /**
-     * Determine default env file name and lcoation 
+     * Determine default env file name and lcoation
      * @param {any} options - Input options or parameters
      * @returns string - default env file name and path
      */
     static resolveEnv(options) {
-        let file = 'default-env.json'
+        let file = 'default-env.json';
         if (options && options.hasOwnProperty('admin') && options.admin) {
-            file = 'default-env-admin.json'
+            file = 'default-env-admin.json';
         }
-        let envFile = path.resolve(process.cwd(), file)
-        debug(`Environment File ${envFile}`)
-        return envFile
+        let envFile = path.resolve(process.cwd(), file);
+        debug(`Environment File ${envFile}`);
+        return envFile;
     }
-
     /**
      * Calcuation the current schema name
      * @param {any} options - Input options or parameters
      * @param {any} db - HANA Client instance of hdb
-     * @returns {Promise<string>} - Schema  
+     * @returns {Promise<string>} - Schema
      */
     static async schemaCalc(options, db) {
-        let schema = ''
+        let schema = '';
         if (options.schema === '**CURRENT_SCHEMA**') {
-            let schemaResults = await db.execSQL(`SELECT CURRENT_SCHEMA FROM DUMMY`)
-            schema = schemaResults[0].CURRENT_SCHEMA
+            let schemaResults = await db.execSQL(`SELECT CURRENT_SCHEMA FROM DUMMY`);
+            schema = schemaResults[0].CURRENT_SCHEMA;
         }
         else if (options.schema === '*') {
-            schema = "%"
+            schema = "%";
         }
         else {
-            schema = options.schema
+            schema = options.schema;
         }
-        debug(`Schema ${schema}`)
-        return schema
+        debug(`Schema ${schema}`);
+        return schema;
     }
-
     /**
      * Load Metadata of a Stored Procedure
      * @param {any} db - HANA Client instance of hdb
      * @param {any} procInfo - Details of Schmea/Stored Procedure to Lookup
-     * @returns {Promise<any>} - Result Set  
-     */    
+     * @returns {Promise<any>} - Result Set
+     */
     static async fetchSPMetadata(db, procInfo) {
         var sqlProcedureMetadata = "SELECT \
           PARAMS.PARAMETER_NAME,           \
@@ -142,10 +136,9 @@ export default class dbClass {
           LEFT JOIN SYS.SYNONYMS AS SYNONYMS                                                                    \
           ON SYNONYMS.SCHEMA_NAME = PARAMS.TABLE_TYPE_SCHEMA AND SYNONYMS.SYNONYM_NAME = PARAMS.TABLE_TYPE_NAME \
           WHERE PARAMS.SCHEMA_NAME = ? AND PARAMS.PROCEDURE_NAME = ?                                            \
-          ORDER BY PARAMS.POSITION"
-        return await db.statementExecPromisified(await db.preparePromisified(sqlProcedureMetadata), [procInfo.schema, procInfo.name])
-      }
-
+          ORDER BY PARAMS.POSITION";
+        return await db.statementExecPromisified(await db.preparePromisified(sqlProcedureMetadata), [procInfo.schema, procInfo.name]);
+    }
     /**
      * Calcuation Object name from wildcards
      * @param {string} name - DB object name
@@ -153,70 +146,69 @@ export default class dbClass {
      */
     static objectName(name) {
         if (typeof name === "undefined" || name === null || name === '*') {
-            name = "%"
-        } else {
-            name += "%"
+            name = "%";
         }
-        return name
+        else {
+            name += "%";
+        }
+        return name;
     }
-
     /**
      * @constructor
      * @param {object} client - HANA DB Client instance of type hdb
      */
     constructor(client) {
-        this.client = client
-        this.client.promisePrepare = promisify(this.client.prepare)
+        this.client = client;
+        // @ts-ignore
+        this.client.promisePrepare = promisify(this.client.prepare);
     }
-
     /**
-     * Destroy Client 
+     * Destroy Client
      */
     destroyClient() {
+        // @ts-ignore
         if (!this.client.hadError && this.client.readyState !== 'closed') {
-            this.client.end()
+            // @ts-ignore
+            this.client.end();
         }
     }
-
     /**
-     * Destroy Client 
+     * Destroy Client
      */
     validateClient() {
-        return (!this.client.hadError && this.client.readyState === 'connected')
+        // @ts-ignore
+        return (!this.client.hadError && this.client.readyState === 'connected');
     }
-
     /**
-     * Prepare database statement 
+     * Prepare database statement
      * @param {string} query - database query
      * @returns {any} - prepared statement object
      */
     preparePromisified(query) {
-        debug(`Query:`, query)
-        return this.client.promisePrepare(query)
+        debug(`Query:`, query);
+        // @ts-ignore
+        return this.client.promisePrepare(query);
     }
-
     /**
      * Execute DB Statement in Batch
      * @param {any} statement - prepared statement object
      * @param {any} parameters - query parameters
-     * @returns {Promise<any>} - resultset 
+     * @returns {Promise<any>} - resultset
      */
     statementExecBatchPromisified(statement, parameters) {
-        statement.promiseExecBatch = promisify(statement.execBatch)
-        return statement.promiseExecBatch(parameters)
+        statement.promiseExecBatch = promisify(statement.execBatch);
+        return statement.promiseExecBatch(parameters);
     }
-
     /**
-     * Execute DB Statement 
+     * Execute DB Statement
      * @param {any} statement - prepared statement object
      * @param {any} parameters - query parameters
-     * @returns {Promise<any>} - resultset 
+     * @returns {Promise<any>} - resultset
      */
     statementExecPromisified(statement, parameters) {
-        statement.promiseExec = promisify(statement.exec)
-        return statement.promiseExec(parameters)
+        statement.promiseExec = promisify(statement.exec);
+        return statement.promiseExec(parameters);
     }
-
     /**
      * Load stored procedure and return proxy function
      * @param {string} schema - Schema name can be null
@@ -224,23 +216,21 @@ export default class dbClass {
      * @returns {Promise<function>} - proxy function
      */
     async loadProcedurePromisified(schema, procedure) {
-        if(!schema){
-           schema = await dbClass.schemaCalc({schema: '**CURRENT_SCHEMA**'}, this)
+        if (!schema) {
+            schema = await dbClass.schemaCalc({ schema: '**CURRENT_SCHEMA**' }, this);
         }
-        let procedureMetaData = await dbClass.fetchSPMetadata(this, {schema: schema, name: procedure})
-        let callString = ''
+        let procedureMetaData = await dbClass.fetchSPMetadata(this, { schema: schema, name: procedure });
+        let callString = '';
         procedureMetaData.forEach(() => {
-            if(callString === ''){
-                callString += `?`
-            }else {
-                callString += `,?`
+            if (callString === '') {
+                callString += `?`;
             }
-          })
-
-        return this.preparePromisified(`CALL ${schema}.${procedure}(${callString})`)
+            else {
+                callString += `,?`;
+            }
+        });
+        return this.preparePromisified(`CALL ${schema}.${procedure}(${callString})`);
     }
-
-
     /**
      * Execute single SQL Statement and directly return result set
      * @param {string} sql - SQL Statement
@@ -249,51 +239,52 @@ export default class dbClass {
     execSQL(sql) {
         return new Promise((resolve, reject) => {
             this.preparePromisified(sql)
-                .then(statement => {
-                    this.statementExecPromisified(statement, [])
-                        .then(results => {
-                            resolve(results)
-                        })
-                        .catch(err => {
-                            reject(err)
-                        });
+                .then((/** @type {any} */ statement) => {
+                this.statementExecPromisified(statement, [])
+                    .then(results => {
+                    resolve(results);
                 })
-                .catch(err => {
-                    reject(err)
-                })
-        })
+                    .catch(err => {
+                    reject(err);
+                });
+            })
+                .catch((/** @type {any} */ err) => {
+                reject(err);
+            });
+        });
     }
-
     /**
      * Call Database Procedure
      * @param {any} storedProc - stored procedure proxy function
      * @param {any} inputParams - input parameters for the stored procedure
-     * @returns 
+     * @returns
      */
     callProcedurePromisified(storedProc, inputParams) {
         return new Promise((resolve, reject) => {
-            storedProc.exec(inputParams, (error, outputScalar, ...results) => {
-                 
-           // storedProc(inputParams, (error, outputScalar, ...results) => {
+            // @ts-ignore
+            storedProc.exec(inputParams, (/** @type {any} */ error, /** @type {any} */ outputScalar, /** @type {string | any[]} */ ...results) => {
+                // storedProc(inputParams, (error, outputScalar, ...results) => {
                 if (error) {
-                    reject(error)
-                } else {
+                    reject(error);
+                }
+                else {
                     if (results.length < 2) {
                         resolve({
                             outputScalar: outputScalar,
                             results: results[0]
-                        })
-                    } else {
+                        });
+                    }
+                    else {
                         let output = {};
                         output.outputScalar = outputScalar;
                         for (let i = 0; i < results.length; i++) {
-                            output[`results${i}`] = results[i]
+                            // @ts-ignore
+                            output[`results${i}`] = results[i];
                         }
-                        resolve(output)
+                        resolve(output);
                     }
                 }
-            })
-        })
+            });
+        });
     }
-
 }

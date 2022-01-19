@@ -4,6 +4,7 @@
     "description": "Promise wrapper for hdb without any depenency to @sap/hana-client",
     "main": "dist/cjs/index.js",
     "module": "dist/mjs/index.js",
+    "type": "module",
     "exports": {
         ".": {
             "import": "./dist/mjs/index.js",
