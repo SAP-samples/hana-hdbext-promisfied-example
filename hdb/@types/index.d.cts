@@ -14,6 +14,12 @@ declare class exports {
      */
     static createConnection(options: any): Promise<any>;
     /**
+     * Set default schema based upon connection paramters
+     * @param {any} options - Input options or parameters
+     * @param {any} client - HANA Client instance of hdb
+     */
+    static setSchema(options: any, client: any): Promise<void>;
+    /**
      * Determine default env file name and lcoation
      * @param {any} options - Input options or parameters
      * @returns string - default env file name and path

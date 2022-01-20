@@ -50,10 +50,11 @@ const path = require("path")
             })
             debug(`Client Ready State`, client.readyState)
 
-            client.connect((/** @type {any} */ err) => {
+            client.connect(async (/** @type {any} */ err) => {
                 if (err) {
                     reject(err)
                 }
+                await this.setSchema(options, client)
                 resolve(client)
             })
         })
@@ -64,20 +65,36 @@ const path = require("path")
      * @param {any} options - Input options or parameters
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
-    static createConnection(options) {
-        return new Promise((resolve, reject) => {
+    static async createConnection(options) {
+        return new Promise(async function (resolve, reject) {
             debug(`Connection Options`, options)
             let client = hdb.createClient(options.hana)
             client.on('error', (/** @type {any} */ err) => {
                 reject(err)
             })
-            client.connect((/** @type {any} */ err) => {
+            client.connect(async (/** @type {any} */ err) => {
                 if (err) {
                     reject(err)
                 }
+                await this.setSchema(options, client)
                 resolve(client)
             })
         })
+    }
+
+    /**
+     * Set default schema based upon connection paramters
+     * @param {any} options - Input options or parameters
+     * @param {any} client - HANA Client instance of hdb
+     */
+    static async setSchema(options, client){
+        if(options.hana){
+            if(options.hana.schema){
+                client.exec(`SET SCHEMA ${options.hana.schema}`, function () {
+                   return
+                  })
+            }
+        }
     }
 
     /**

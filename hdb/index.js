@@ -52,10 +52,11 @@ export default class dbClass {
             })
             debug(`Client Ready State`, client.readyState)
 
-            client.connect((/** @type {any} */ err) => {
+            client.connect(async (/** @type {any} */ err) => {
                 if (err) {
                     reject(err)
                 }
+                await dbClass.setSchema(options, client)
                 resolve(client)
             })
         })
@@ -67,19 +68,35 @@ export default class dbClass {
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static createConnection(options) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async function (resolve, reject) {
             debug(`Connection Options`, options)
             let client = hdb.createClient(options.hana)
             client.on('error', (/** @type {any} */ err) => {
                 reject(err)
             })
-            client.connect((/** @type {any} */ err) => {
+            client.connect(async (/** @type {any} */ err) => {
                 if (err) {
                     reject(err)
                 }
+                await dbClass.setSchema(options, client)
                 resolve(client)
             })
         })
+    }
+
+    /**
+     * Set default schema based upon connection paramters
+     * @param {any} options - Input options or parameters
+     * @param {any} client - HANA Client instance of hdb
+     */
+    static async setSchema(options, client) {
+        if (options.hana) {
+            if (options.hana.schema) {
+                 client.exec(`SET SCHEMA ${options.hana.schema}`, function () {
+                    return
+                })
+            }
+        }
     }
 
     /**
@@ -124,7 +141,7 @@ export default class dbClass {
      * @param {any} db - HANA Client instance of hdb
      * @param {any} procInfo - Details of Schmea/Stored Procedure to Lookup
      * @returns {Promise<any>} - Result Set  
-     */    
+     */
     static async fetchSPMetadata(db, procInfo) {
         var sqlProcedureMetadata = "SELECT \
           PARAMS.PARAMETER_NAME,           \
@@ -145,7 +162,7 @@ export default class dbClass {
           WHERE PARAMS.SCHEMA_NAME = ? AND PARAMS.PROCEDURE_NAME = ?                                            \
           ORDER BY PARAMS.POSITION"
         return await db.statementExecPromisified(await db.preparePromisified(sqlProcedureMetadata), [procInfo.schema, procInfo.name])
-      }
+    }
 
     /**
      * Calcuation Object name from wildcards
@@ -230,18 +247,18 @@ export default class dbClass {
      * @returns {Promise<function>} - proxy function
      */
     async loadProcedurePromisified(schema, procedure) {
-        if(!schema){
-           schema = await dbClass.schemaCalc({schema: '**CURRENT_SCHEMA**'}, this)
+        if (!schema) {
+            schema = await dbClass.schemaCalc({ schema: '**CURRENT_SCHEMA**' }, this)
         }
-        let procedureMetaData = await dbClass.fetchSPMetadata(this, {schema: schema, name: procedure})
+        let procedureMetaData = await dbClass.fetchSPMetadata(this, { schema: schema, name: procedure })
         let callString = ''
         procedureMetaData.forEach(() => {
-            if(callString === ''){
+            if (callString === '') {
                 callString += `?`
-            }else {
+            } else {
                 callString += `,?`
             }
-          })
+        })
 
         return this.preparePromisified(`CALL ${schema}.${procedure}(${callString})`)
     }
@@ -280,8 +297,8 @@ export default class dbClass {
         return new Promise((resolve, reject) => {
             // @ts-ignore
             storedProc.exec(inputParams, (/** @type {any} */ error, /** @type {any} */ outputScalar, /** @type {string | any[]} */ ...results) => {
-                 
-           // storedProc(inputParams, (error, outputScalar, ...results) => {
+
+                // storedProc(inputParams, (error, outputScalar, ...results) => {
                 if (error) {
                     reject(error)
                 } else {
