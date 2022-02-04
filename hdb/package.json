@@ -1,7 +1,7 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202201.6",
-    "description": "Promise wrapper for hdb without any depenency to @sap/hana-client",
+    "version": "2.202202.1",
+    "description": "Promise wrapper for hdb without any dependency to @sap/hana-client",
     "main": "./index.cjs",
     "exports": {
         "./package.json": "./package.json",
@@ -31,22 +31,17 @@
     },
     "dependencies": {
         "debug": "4.3.3",
-        "dotenv": "14.2.0",
+        "dotenv": "^16.0.0",
         "hdb": "0.19.1",
-        "@sap/xsenv": "^3.1.1"
+        "@sap/xsenv": "^3.2.0"
     },
     "devDependencies": {
         "@types/debug": "^4.1.7",
-        "@types/node": "^17.0.10",
-        "@types/sap__xsenv": "^2.0.3",
-        "chai": "^4.3.4",
-        "eslint": "^8.6.0"
+        "@types/node": "^17.0.14",
+        "@types/sap__xsenv": "^2.0.3"
     },
     "scripts": {
         "start": "node test",
-        "lint": "./node_modules/.bin/eslint ./lib",
-        "lint-local": "./node_modules/.bin/eslint ./lib --output-file=eslint.log.htm --format=html --fix",
-        "validate": "npm run lint && npm run test",
         "types": "tsc  --declaration --allowJs --emitDeclarationOnly --outDir @types",
         "prodinstall": "npm install --only=prod"
     },
