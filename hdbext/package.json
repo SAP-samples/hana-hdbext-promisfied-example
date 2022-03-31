@@ -36,14 +36,15 @@
         "dotenv": "^16.0.0"
     },
     "devDependencies": {
+        "@types/mocha": "^9.1.0",
         "@types/node": "^17.0.23",
         "mocha": "^9.2.2"
     },
     "scripts": {
         "start": "node test",
-        "build": "tsc",
-        "types": "npx typescript  --declaration --allowJs --emitDeclarationOnly --outDir @types",
-        "prodinstall": "npm install --only=prod"
+        "types": "tsc  --declaration --allowJs --emitDeclarationOnly --outDir @types",
+        "prodinstall": "npm install --only=prod",
+        "test": "mocha './tests/*.Test.js' --parallel --timeout 5000"
     },
     "engines": {
         "node": "^12.18.0 || ^14.0.0 || ^16.0.0"
