@@ -1,4 +1,4 @@
-# Promisfied Wrapper around @sap/hdbext
+# Promisfied Wrapper around hdb
 
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/hana-hdbext-promisfied-example)](https://api.reuse.software/info/github.com/SAP-samples/hana-hdbext-promisfied-example)
 
