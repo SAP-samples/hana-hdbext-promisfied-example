@@ -63,7 +63,7 @@ export default class dbClass {
     }
 
     /**
-     * Create Database Connection with specific conneciton options in format expected by hdb
+     * Create Database Connection with specific connection options in format expected by hdb
      * @param {any} options - Input options or parameters
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
@@ -85,7 +85,7 @@ export default class dbClass {
     }
 
     /**
-     * Set default schema based upon connection paramters
+     * Set default schema based upon connection parameters
      * @param {any} options - Input options or parameters
      * @param {any} client - HANA Client instance of hdb
      */
@@ -100,7 +100,7 @@ export default class dbClass {
     }
 
     /**
-     * Determine default env file name and lcoation 
+     * Determine default env file name and location 
      * @param {any} options - Input options or parameters
      * @returns string - default env file name and path
      */
@@ -115,7 +115,7 @@ export default class dbClass {
     }
 
     /**
-     * Calcuation the current schema name
+     * Calculation the current schema name
      * @param {any} options - Input options or parameters
      * @param {any} db - HANA Client instance of hdb
      * @returns {Promise<string>} - Schema  
@@ -139,7 +139,7 @@ export default class dbClass {
     /**
      * Load Metadata of a Stored Procedure
      * @param {any} db - HANA Client instance of hdb
-     * @param {any} procInfo - Details of Schmea/Stored Procedure to Lookup
+     * @param {any} procInfo - Details of Schema/Stored Procedure to Lookup
      * @returns {Promise<any>} - Result Set  
      */
     static async fetchSPMetadata(db, procInfo) {
@@ -165,7 +165,7 @@ export default class dbClass {
     }
 
     /**
-     * Calcuation Object name from wildcards
+     * Calculation Object name from wildcards
      * @param {string} name - DB object name
      * @returns {string} - final object name
      */

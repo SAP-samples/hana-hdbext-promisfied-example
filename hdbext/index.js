@@ -55,7 +55,7 @@ export default class dbClass {
     }
 
     /**
-     * Create Database Connection with specific conneciton options in format expected by sap/hdbext
+     * Create Database Connection with specific connection options in format expected by sap/hdbext
      * @param {any} options - Input options or parameters
      * @returns {Promise<any>} - HANA Client instance of sap/hdbext
      */
@@ -74,7 +74,7 @@ export default class dbClass {
     }
 
     /**
-     * Determine default env file name and lcoation 
+     * Determine default env file name and location 
      * @param {any} options - Input options or parameters
      * @returns string - default env file name and path
      */
@@ -89,7 +89,7 @@ export default class dbClass {
     }
 
     /**
-     * Calcuation the current schema name
+     * Calculation the current schema name
      * @param {any} options - Input options or parameters
      * @param {any} db - HANA Client instance of sap/hdbext
      * @returns {Promise<string>} - Schema  
@@ -111,7 +111,7 @@ export default class dbClass {
     }
 
     /**
-     * Calcuation Object name from wildcards
+     * Calculation Object name from wildcards
      * @param {string} name - DB object name
      * @returns {string} - final object name
      */
