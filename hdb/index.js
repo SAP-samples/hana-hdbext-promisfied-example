@@ -44,6 +44,10 @@ export default class dbClass {
                     throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration can be read or processed`)
                 }
             }
+            if(options.hana.encrypt){
+                options.hana.useTLS = true
+            }
+
             debug(`Connection Options`, options)
             let client = hdb.createClient(options.hana)
             client.on('error', (/** @type {any} */ err) => {
