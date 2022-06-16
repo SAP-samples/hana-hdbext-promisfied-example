@@ -73,6 +73,9 @@ export default class dbClass {
      */
     static createConnection(options) {
         return new Promise(async function (resolve, reject) {
+            if(options.hana.encrypt){
+                options.hana.useTLS = true
+            }
             debug(`Connection Options`, options)
             let client = hdb.createClient(options.hana)
             client.on('error', (/** @type {any} */ err) => {
