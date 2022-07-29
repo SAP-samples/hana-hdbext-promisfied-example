@@ -1,23 +1,23 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202206.1",
+    "version": "2.202207.1",
     "lockfileVersion": 2,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdb-promisfied",
-            "version": "2.202206.1",
+            "version": "2.202207.1",
             "license": "Apache-2.0",
             "dependencies": {
-                "@sap/xsenv": "^3.3.1",
+                "@sap/xsenv": "^3.3.2",
                 "debug": "4.3.4",
                 "dotenv": "^16.0.1",
-                "hdb": "0.19.3"
+                "hdb": "0.19.4"
             },
             "devDependencies": {
                 "@types/debug": "^4.1.7",
                 "@types/mocha": "^9.1.1",
-                "@types/node": "^17.0.42",
+                "@types/node": "^18.6.2",
                 "@types/sap__xsenv": "^2.0.3",
                 "mocha": "^10.0.0"
             },
@@ -26,9 +26,9 @@
             }
         },
         "node_modules/@sap/xsenv": {
-            "version": "3.3.1",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-3.3.1.tgz",
-            "integrity": "sha512-ESsfrlGBRZ7AF1ud+ZZ3CVfGgifPx2lo0djOpqHgzPzSkjv3h3hIGXF5ErW6gKcrwSKCPNA6j3STfbdSK5zqwA==",
+            "version": "3.3.2",
+            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-3.3.2.tgz",
+            "integrity": "sha512-PRxzoNEB0wMCuQOOC7q7QIkCYyLgxgHY1vIHFcPorajLLskqhqJNPfycWAfhUgDn6WryGluUVxnQVeTQncY6dg==",
             "hasShrinkwrap": true,
             "dependencies": {
                 "debug": "4.3.3",
@@ -96,9 +96,9 @@
             "dev": true
         },
         "node_modules/@types/node": {
-            "version": "17.0.42",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-17.0.42.tgz",
-            "integrity": "sha512-Q5BPGyGKcvQgAMbsr7qEGN/kIPN6zZecYYABeTDBizOsau+2NMdSVTar9UQw21A2+JyA2KRNDYaYrPB0Rpk2oQ==",
+            "version": "18.6.2",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-18.6.2.tgz",
+            "integrity": "sha512-KcfkBq9H4PI6Vpu5B/KoPeuVDAbmi+2mDBqGPGUgoL7yXQtcWGu2vJWmmRkneWK3Rh0nIAX192Aa87AqKHYChQ==",
             "dev": true
         },
         "node_modules/@types/sap__xsenv": {
@@ -511,9 +511,9 @@
             }
         },
         "node_modules/hdb": {
-            "version": "0.19.3",
-            "resolved": "https://registry.npmjs.org/hdb/-/hdb-0.19.3.tgz",
-            "integrity": "sha512-xsODYJAvgT8Sf1Fp2vx+JtTbUdGJ9BSW5bGHqbU1XaoLsjtyct6ttgyrJl8v7WuF41OKkrYKkAp2Rnxc/Vwxqw==",
+            "version": "0.19.4",
+            "resolved": "https://registry.npmjs.org/hdb/-/hdb-0.19.4.tgz",
+            "integrity": "sha512-QykOuRcXo3+aqmXnpu3omClzBys9v9KdyqdMZx4wpfwj3qSNgrPPaJQB8AGs14ZL6WHQylCDwW2To6+mvsFiiw==",
             "dependencies": {
                 "iconv-lite": "^0.4.18"
             },
@@ -1050,9 +1050,9 @@
     },
     "dependencies": {
         "@sap/xsenv": {
-            "version": "3.3.1",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-3.3.1.tgz",
-            "integrity": "sha512-ESsfrlGBRZ7AF1ud+ZZ3CVfGgifPx2lo0djOpqHgzPzSkjv3h3hIGXF5ErW6gKcrwSKCPNA6j3STfbdSK5zqwA==",
+            "version": "3.3.2",
+            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-3.3.2.tgz",
+            "integrity": "sha512-PRxzoNEB0wMCuQOOC7q7QIkCYyLgxgHY1vIHFcPorajLLskqhqJNPfycWAfhUgDn6WryGluUVxnQVeTQncY6dg==",
             "requires": {
                 "debug": "4.3.3",
                 "node-cache": "^5.1.0",
@@ -1118,9 +1118,9 @@
             "dev": true
         },
         "@types/node": {
-            "version": "17.0.42",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-17.0.42.tgz",
-            "integrity": "sha512-Q5BPGyGKcvQgAMbsr7qEGN/kIPN6zZecYYABeTDBizOsau+2NMdSVTar9UQw21A2+JyA2KRNDYaYrPB0Rpk2oQ==",
+            "version": "18.6.2",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-18.6.2.tgz",
+            "integrity": "sha512-KcfkBq9H4PI6Vpu5B/KoPeuVDAbmi+2mDBqGPGUgoL7yXQtcWGu2vJWmmRkneWK3Rh0nIAX192Aa87AqKHYChQ==",
             "dev": true
         },
         "@types/sap__xsenv": {
@@ -1421,9 +1421,9 @@
             "dev": true
         },
         "hdb": {
-            "version": "0.19.3",
-            "resolved": "https://registry.npmjs.org/hdb/-/hdb-0.19.3.tgz",
-            "integrity": "sha512-xsODYJAvgT8Sf1Fp2vx+JtTbUdGJ9BSW5bGHqbU1XaoLsjtyct6ttgyrJl8v7WuF41OKkrYKkAp2Rnxc/Vwxqw==",
+            "version": "0.19.4",
+            "resolved": "https://registry.npmjs.org/hdb/-/hdb-0.19.4.tgz",
+            "integrity": "sha512-QykOuRcXo3+aqmXnpu3omClzBys9v9KdyqdMZx4wpfwj3qSNgrPPaJQB8AGs14ZL6WHQylCDwW2To6+mvsFiiw==",
             "requires": {
                 "iconv-lite": "^0.4.18"
             }
