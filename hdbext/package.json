@@ -1,6 +1,6 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202207.1",
+    "version": "2.202208.1",
     "description": "Promise wrapper for @sap/hdbext",
     "main": "./index.cjs",
     "exports": {
@@ -36,9 +36,7 @@
         "dotenv": "^16.0.1"
     },
     "devDependencies": {
-        "@types/mocha": "^9.1.1",
-        "@types/node": "^18.6.2",
-        "mocha": "^10.0.0"
+        "@types/node": "^18.6.2"
     },
     "scripts": {
         "start": "node test",
