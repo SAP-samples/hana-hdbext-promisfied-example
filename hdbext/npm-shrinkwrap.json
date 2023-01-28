@@ -1,34 +1,34 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202208.1",
-    "lockfileVersion": 2,
+    "version": "2.202301.1",
+    "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdbext-promisfied",
-            "version": "2.202208.1",
+            "version": "2.202301.1",
             "license": "Apache-2.0",
             "dependencies": {
-                "@sap/hdbext": "^7.6.5",
-                "@sap/xsenv": "^3.3.2",
+                "@sap/hdbext": "^7.7.2",
+                "@sap/xsenv": "^3.4.0",
                 "debug": "^4.3.4",
-                "dotenv": "^16.0.1"
+                "dotenv": "^16.0.3"
             },
             "devDependencies": {
-                "@types/node": "^18.6.2"
+                "@types/node": "^18.11.18"
             },
             "engines": {
-                "node": "^12.18.0 || ^14.0.0 || ^16.0.0"
+                "node": ">=14.18.0"
             }
         },
         "node_modules/@sap/hdbext": {
-            "version": "7.6.5",
-            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-7.6.5.tgz",
-            "integrity": "sha512-MpxquNQEOvo39IboUKfULACnuSrauZg91+dx4DwxlQ0Wu9xjbfFCI8WgECVwdlUf8AJRUS436UIaEgxTpMnxJA==",
+            "version": "7.7.2",
+            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-7.7.2.tgz",
+            "integrity": "sha512-jCSQQllHAPN2Ki1Ika91GbxsGdpJcEzjRhagu5j+6L29WNCVaTSJOAZQDbehouaz4tQGX3dK6yerJVaM/Nyftg==",
             "hasShrinkwrap": true,
             "dependencies": {
                 "@sap/e2e-trace": "^3.1.0",
-                "@sap/hana-client": "2.13.22",
+                "@sap/hana-client": "2.15.19",
                 "accept-language": "2.0.16",
                 "async": "3.2.2",
                 "debug": "4.3.1",
@@ -36,11 +36,11 @@
                 "verror": "1.10.0"
             },
             "engines": {
-                "node": "^8.0.0 || ^10.0.0 || ^12.0.0 || ^14.0.0 || ^16.0.0"
+                "node": "^8.0.0 || ^10.0.0 || ^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0"
             }
         },
         "node_modules/@sap/hdbext/node_modules/@sap/e2e-trace": {
-            "version": "3.1.0",
+            "version": "3.2.0",
             "dependencies": {
                 "request-stats": "3.0.0"
             }
@@ -71,7 +71,7 @@
             "version": "1.0.2"
         },
         "node_modules/@sap/hdbext/node_modules/@sap/hana-client": {
-            "version": "2.13.22",
+            "version": "2.15.19",
             "dependencies": {
                 "debug": "3.1.0"
             }
@@ -127,9 +127,9 @@
             }
         },
         "node_modules/@sap/xsenv": {
-            "version": "3.3.2",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-3.3.2.tgz",
-            "integrity": "sha512-PRxzoNEB0wMCuQOOC7q7QIkCYyLgxgHY1vIHFcPorajLLskqhqJNPfycWAfhUgDn6WryGluUVxnQVeTQncY6dg==",
+            "version": "3.4.0",
+            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-3.4.0.tgz",
+            "integrity": "sha512-bZ/NFhS+wZI0JlMO1OOBEThfyOTmf2x5oQ+wToJGkZ2T5+gLUE3emZiC4iHA+BuSmUtO+vYoe29Q1qiE4qaiJQ==",
             "hasShrinkwrap": true,
             "dependencies": {
                 "debug": "4.3.3",
@@ -137,7 +137,7 @@
                 "verror": "1.10.0"
             },
             "engines": {
-                "node": "^10.0.0 || ^12.0.0 || ^14.0.0 || ^16.0.0"
+                "node": "^10.0.0 || ^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0"
             }
         },
         "node_modules/@sap/xsenv/node_modules/assert-plus": {
@@ -176,9 +176,9 @@
             }
         },
         "node_modules/@types/node": {
-            "version": "18.6.3",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-18.6.3.tgz",
-            "integrity": "sha512-6qKpDtoaYLM+5+AFChLhHermMQxc3TOEFIDzrZLPRGHPrLEwqFkkT5Kx3ju05g6X7uDPazz3jHbKPX0KzCjntg==",
+            "version": "18.11.18",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz",
+            "integrity": "sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==",
             "dev": true
         },
         "node_modules/debug": {
@@ -198,194 +198,14 @@
             }
         },
         "node_modules/dotenv": {
-            "version": "16.0.1",
-            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.0.1.tgz",
-            "integrity": "sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ==",
+            "version": "16.0.3",
+            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.0.3.tgz",
+            "integrity": "sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==",
             "engines": {
                 "node": ">=12"
             }
         },
         "node_modules/ms": {
-            "version": "2.1.2",
-            "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
-            "integrity": "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w=="
-        }
-    },
-    "dependencies": {
-        "@sap/hdbext": {
-            "version": "7.6.5",
-            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-7.6.5.tgz",
-            "integrity": "sha512-MpxquNQEOvo39IboUKfULACnuSrauZg91+dx4DwxlQ0Wu9xjbfFCI8WgECVwdlUf8AJRUS436UIaEgxTpMnxJA==",
-            "requires": {
-                "@sap/e2e-trace": "^3.1.0",
-                "@sap/hana-client": "2.13.22",
-                "accept-language": "2.0.16",
-                "async": "3.2.2",
-                "debug": "4.3.1",
-                "lodash": "4.17.21",
-                "verror": "1.10.0"
-            },
-            "dependencies": {
-                "@sap/e2e-trace": {
-                    "version": "3.1.0",
-                    "requires": {
-                        "request-stats": "3.0.0"
-                    },
-                    "dependencies": {
-                        "http-headers": {
-                            "version": "3.0.2",
-                            "requires": {
-                                "next-line": "^1.1.0"
-                            }
-                        },
-                        "next-line": {
-                            "version": "1.1.0"
-                        },
-                        "once": {
-                            "version": "1.4.0",
-                            "requires": {
-                                "wrappy": "1"
-                            }
-                        },
-                        "request-stats": {
-                            "version": "3.0.0",
-                            "requires": {
-                                "http-headers": "^3.0.1",
-                                "once": "^1.4.0"
-                            }
-                        },
-                        "wrappy": {
-                            "version": "1.0.2"
-                        }
-                    }
-                },
-                "@sap/hana-client": {
-                    "version": "2.13.22",
-                    "requires": {
-                        "debug": "3.1.0"
-                    },
-                    "dependencies": {
-                        "debug": {
-                            "version": "3.1.0",
-                            "requires": {
-                                "ms": "2.0.0"
-                            }
-                        },
-                        "ms": {
-                            "version": "2.0.0"
-                        }
-                    }
-                },
-                "accept-language": {
-                    "version": "2.0.16",
-                    "requires": {
-                        "bcp47": "^1.1.2"
-                    }
-                },
-                "assert-plus": {
-                    "version": "1.0.0"
-                },
-                "async": {
-                    "version": "3.2.2"
-                },
-                "bcp47": {
-                    "version": "1.1.2"
-                },
-                "core-util-is": {
-                    "version": "1.0.2"
-                },
-                "debug": {
-                    "version": "4.3.1",
-                    "requires": {
-                        "ms": "2.1.2"
-                    }
-                },
-                "extsprintf": {
-                    "version": "1.4.1"
-                },
-                "lodash": {
-                    "version": "4.17.21"
-                },
-                "ms": {
-                    "version": "2.1.2"
-                },
-                "verror": {
-                    "version": "1.10.0",
-                    "requires": {
-                        "assert-plus": "^1.0.0",
-                        "core-util-is": "1.0.2",
-                        "extsprintf": "^1.2.0"
-                    }
-                }
-            }
-        },
-        "@sap/xsenv": {
-            "version": "3.3.2",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-3.3.2.tgz",
-            "integrity": "sha512-PRxzoNEB0wMCuQOOC7q7QIkCYyLgxgHY1vIHFcPorajLLskqhqJNPfycWAfhUgDn6WryGluUVxnQVeTQncY6dg==",
-            "requires": {
-                "debug": "4.3.3",
-                "node-cache": "^5.1.0",
-                "verror": "1.10.0"
-            },
-            "dependencies": {
-                "assert-plus": {
-                    "version": "1.0.0"
-                },
-                "clone": {
-                    "version": "2.1.2"
-                },
-                "core-util-is": {
-                    "version": "1.0.2"
-                },
-                "debug": {
-                    "version": "4.3.3",
-                    "requires": {
-                        "ms": "2.1.2"
-                    }
-                },
-                "extsprintf": {
-                    "version": "1.4.1"
-                },
-                "ms": {
-                    "version": "2.1.2"
-                },
-                "node-cache": {
-                    "version": "5.1.2",
-                    "requires": {
-                        "clone": "2.x"
-                    }
-                },
-                "verror": {
-                    "version": "1.10.0",
-                    "requires": {
-                        "assert-plus": "^1.0.0",
-                        "core-util-is": "1.0.2",
-                        "extsprintf": "^1.2.0"
-                    }
-                }
-            }
-        },
-        "@types/node": {
-            "version": "18.6.3",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-18.6.3.tgz",
-            "integrity": "sha512-6qKpDtoaYLM+5+AFChLhHermMQxc3TOEFIDzrZLPRGHPrLEwqFkkT5Kx3ju05g6X7uDPazz3jHbKPX0KzCjntg==",
-            "dev": true
-        },
-        "debug": {
-            "version": "4.3.4",
-            "resolved": "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz",
-            "integrity": "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
-            "requires": {
-                "ms": "2.1.2"
-            }
-        },
-        "dotenv": {
-            "version": "16.0.1",
-            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.0.1.tgz",
-            "integrity": "sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ=="
-        },
-        "ms": {
             "version": "2.1.2",
             "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
             "integrity": "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w=="
