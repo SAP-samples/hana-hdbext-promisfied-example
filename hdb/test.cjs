@@ -85,7 +85,7 @@ test2_2()
   async function test3() {
     try {
         let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
-        let sp = await db.loadProcedurePromisified('SYS', 'IS_VALID_PASSWORD')
+        let sp = await db.loadProcedurePromisified('SYS', 'GET_INSUFFICIENT_PRIVILEGE_ERROR_DETAILS') //'IS_VALID_PASSWORD')
         let output = await db.callProcedurePromisified(sp, {PASSWORD: "TEST"})
 
         console.table(output)

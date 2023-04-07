@@ -265,7 +265,10 @@ const path = require("path")
                 callString += `,?`
             }
           })
-
+          if(callString === ''){
+            callString += `?`
+          }
+        console.log(callString)
         return this.preparePromisified(`CALL ${schema}.${procedure}(${callString})`)
     }
 
