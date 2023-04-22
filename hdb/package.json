@@ -1,6 +1,6 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202304.1",
+    "version": "2.202304.2",
     "description": "Promise wrapper for hdb without any dependency to @sap/hana-client",
     "main": "./index.cjs",
     "exports": {
