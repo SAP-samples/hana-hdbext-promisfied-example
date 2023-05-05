@@ -1,22 +1,22 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202304.1",
+    "version": "2.202305.1",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdbext-promisfied",
-            "version": "2.202304.1",
+            "version": "2.202305.1",
             "license": "Apache-2.0",
             "dependencies": {
-                "@sap/hdbext": "^7.7.3",
+                "@sap/hdbext": "^7.7.4",
                 "@sap/xsenv": "^3.4.0",
                 "debug": "^4.3.4",
                 "dotenv": "^16.0.3"
             },
             "devDependencies": {
                 "@types/mocha": "^10.0.1",
-                "@types/node": "^18.15.11",
+                "@types/node": "^20.0.0",
                 "mocha": "^10.2.0"
             },
             "engines": {
@@ -24,13 +24,13 @@
             }
         },
         "node_modules/@sap/hdbext": {
-            "version": "7.7.3",
-            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-7.7.3.tgz",
-            "integrity": "sha512-cfJfYKo3VNTEtOJPgZS+J7CK4kuF21j6NLso+TW4tGMO3CNoWRwdj+if+tpFDMaPlC0vnw6KemQN8DYHh47sZw==",
+            "version": "7.7.4",
+            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-7.7.4.tgz",
+            "integrity": "sha512-AeFkOce+38RYv/V5UzoVxyuXDu5lXyFdGvumX2a4/aMQXF9VUFbewxT/6itdMenQgoSTDooGOBRrqOrtX+h2hw==",
             "hasShrinkwrap": true,
             "dependencies": {
                 "@sap/e2e-trace": "^3.1.0",
-                "@sap/hana-client": "2.16.21",
+                "@sap/hana-client": "2.16.26",
                 "accept-language": "2.0.16",
                 "async": "3.2.2",
                 "debug": "4.3.1",
@@ -38,7 +38,7 @@
                 "verror": "1.10.0"
             },
             "engines": {
-                "node": "^8.0.0 || ^10.0.0 || ^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0"
+                "node": "^10.0.0 || ^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0"
             }
         },
         "node_modules/@sap/hdbext/node_modules/@sap/e2e-trace": {
@@ -73,7 +73,7 @@
             "version": "1.0.2"
         },
         "node_modules/@sap/hdbext/node_modules/@sap/hana-client": {
-            "version": "2.16.21",
+            "version": "2.16.26",
             "dependencies": {
                 "debug": "3.1.0"
             }
@@ -184,9 +184,9 @@
             "dev": true
         },
         "node_modules/@types/node": {
-            "version": "18.15.11",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-18.15.11.tgz",
-            "integrity": "sha512-E5Kwq2n4SbMzQOn6wnmBjuK9ouqlURrcZDVfbo9ftDDTFt3nk7ZKK4GMOzoYgnpQJKcxwQw+lGaBvvlMo0qN/Q==",
+            "version": "20.0.0",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.0.0.tgz",
+            "integrity": "sha512-cD2uPTDnQQCVpmRefonO98/PPijuOnnEy5oytWJFPY1N9aJCz2wJ5kSGWO+zJoed2cY2JxQh6yBuUq4vIn61hw==",
             "dev": true
         },
         "node_modules/ansi-colors": {
