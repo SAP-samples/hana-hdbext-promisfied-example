@@ -1,15 +1,15 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202304.2",
+    "version": "2.202308.1",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdb-promisfied",
-            "version": "2.202304.2",
+            "version": "2.202308.1",
             "license": "Apache-2.0",
             "dependencies": {
-                "@sap/xsenv": "^3.4.0",
+                "@sap/xsenv": "^4.0.0",
                 "debug": "4.3.4",
                 "dotenv": "^16.3.1",
                 "hdb": "0.19.5"
@@ -17,7 +17,7 @@
             "devDependencies": {
                 "@types/debug": "^4.1.8",
                 "@types/mocha": "^10.0.1",
-                "@types/node": "^20.3.1",
+                "@types/node": "^20.5.4",
                 "@types/sap__xsenv": "^3.3.0",
                 "mocha": "^10.2.0"
             },
@@ -26,9 +26,9 @@
             }
         },
         "node_modules/@sap/xsenv": {
-            "version": "3.4.0",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-3.4.0.tgz",
-            "integrity": "sha512-bZ/NFhS+wZI0JlMO1OOBEThfyOTmf2x5oQ+wToJGkZ2T5+gLUE3emZiC4iHA+BuSmUtO+vYoe29Q1qiE4qaiJQ==",
+            "version": "4.0.0",
+            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-4.0.0.tgz",
+            "integrity": "sha512-I3otC5A+WYt/4mnbgQmY1sx9OsLjcvhmDp800zLWqNMPbYy7FmnpgZ6TbECnsNL5pU1NOSHV9CNFpomdP/FBdg==",
             "hasShrinkwrap": true,
             "dependencies": {
                 "debug": "4.3.3",
@@ -36,7 +36,7 @@
                 "verror": "1.10.0"
             },
             "engines": {
-                "node": "^10.0.0 || ^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0"
+                "node": "^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0"
             }
         },
         "node_modules/@sap/xsenv/node_modules/assert-plus": {
@@ -96,9 +96,9 @@
             "dev": true
         },
         "node_modules/@types/node": {
-            "version": "20.3.1",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.3.1.tgz",
-            "integrity": "sha512-EhcH/wvidPy1WeML3TtYFGR83UzjxeWRen9V402T8aUGYsCHOmfoisV3ZSg03gAFIbLq8TnWOJ0f4cALtnSEUg==",
+            "version": "20.5.4",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.5.4.tgz",
+            "integrity": "sha512-Y9vbIAoM31djQZrPYjpTLo0XlaSwOIsrlfE3LpulZeRblttsLQRFRlBAppW0LOxyT3ALj2M5vU1ucQQayQH3jA==",
             "dev": true
         },
         "node_modules/@types/sap__xsenv": {
