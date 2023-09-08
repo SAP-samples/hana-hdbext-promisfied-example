@@ -269,7 +269,7 @@ const path = require("path")
             callString += `?`
           }
         console.log(callString)
-        return this.preparePromisified(`CALL ${schema}.${procedure}(${callString})`)
+        return this.preparePromisified(`CALL ${schema}."${procedure}"(${callString})`)
     }
 
 

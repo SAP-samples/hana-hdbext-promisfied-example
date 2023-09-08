@@ -267,7 +267,7 @@ export default class dbClass {
             }
         })
 
-        return this.preparePromisified(`CALL ${schema}.${procedure}(${callString})`)
+        return this.preparePromisified(`CALL ${schema}."${procedure}"(${callString})`)
     }
 
 
