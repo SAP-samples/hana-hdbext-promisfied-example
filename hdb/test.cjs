@@ -1,4 +1,5 @@
 const dbClass = require('./index.cjs')
+const xsenv = require("@sap/xsenv")
 
 /**
  * Test #1
@@ -29,7 +30,7 @@ async function test1() {
             console.error(`ERROR: ${err.toString()}`)
         })
 }
-test1()
+//test1()
 
 /**
  * Test #2
@@ -46,7 +47,7 @@ async function test2() {
         console.error(`ERROR: ${err.toString()}`)
     }
 }
-test2()
+//test2()
 
 /**
  * Test #2.1 Current Schema
@@ -61,7 +62,7 @@ test2()
         console.error(`ERROR: ${err.toString()}`)
     }
 }
-test2_1()
+//test2_1()
 
 /**
  * Test #2.2
@@ -77,7 +78,7 @@ test2_1()
         console.error(`ERROR: ${err.toString()}`)
     }
 }
-test2_2()
+//test2_2()
 
 /**
  * Test #3
@@ -85,7 +86,7 @@ test2_2()
   async function test3() {
     try {
         let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
-        let sp = await db.loadProcedurePromisified('SYS', 'GET_INSUFFICIENT_PRIVILEGE_ERROR_DETAILS') //'IS_VALID_PASSWORD')
+        let sp = await db.loadProcedurePromisified('SYS', 'IS_VALID_PASSWORD')
         let output = await db.callProcedurePromisified(sp, {PASSWORD: "TEST"})
 
         console.table(output)
@@ -94,4 +95,32 @@ test2_2()
         console.error(`ERROR: ${err.toString()}`)
     }
 }
+//test3() 
+
+
+
+async function testUps() {
+    try {
+        xsenv.loadEnv()
+        let userProvidedHanaEnv = xsenv.serviceCredentials({ label: 'user-provided' })
+        //console.log("credentials for user provided")
+        //console.log(userProvidedHanaEnv)
+        let connectionDetails = { hana: userProvidedHanaEnv }
+        //console.log(connectionDetails.hana)
+        //let db = new dbClass(await dbClass.createConnection(dbClass.resolveEnv()));
+        const db = new dbClass(await dbClass.createConnection(connectionDetails))
+        const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
+                                               FROM "DUMMY"`)
+        const results = await db.statementExecPromisified(statement, [])
+        console.table(results)
+        db.destroyClient()
+    } catch (/** @type {any} */ err) {
+        console.error(`ERROR: ${err.toString()}`)
+    }
+
+}
+test1()
+test2_1()
+test2_2()
 test3() 
+testUps()

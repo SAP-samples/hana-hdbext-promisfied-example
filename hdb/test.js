@@ -124,11 +124,11 @@ export async function testUps() {
     try {
         xsenv.loadEnv()
         let userProvidedHanaEnv = xsenv.serviceCredentials({ label: 'user-provided' })
-        console.log("credentials for user provided")
-        console.log(userProvidedHanaEnv)
+        //console.log("credentials for user provided")
+        //console.log(userProvidedHanaEnv)
         let connectionDetails = { hana: userProvidedHanaEnv }
-        console.log(connectionDetails.hana)
-        // let db = new dbClass(await dbClass.createConnection(dbClass.resolveEnv(null)));
+        //console.log(connectionDetails.hana)
+      //  let db = new dbClass(await dbClass.createConnection(dbClass.resolveEnv(null)))
         const db = new dbClass(await dbClass.createConnection(connectionDetails))
         const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
                                                FROM "DUMMY"`)

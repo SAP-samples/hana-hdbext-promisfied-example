@@ -22,6 +22,7 @@ const path = require("path")
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static createConnectionFromEnv(envFile) {
+        const setSchema = this.setSchema
         return new Promise((resolve, reject) => {
             dotenv.config()
             xsenv.loadEnv(envFile)
@@ -42,7 +43,8 @@ const path = require("path")
                     throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration can be read or processed`)
                 }
             }
-            if(options.hana.encrypt){
+            //console.log(options)
+            if(options && options.hana && options.hana.encrypt){
                 options.hana.useTLS = true
             }
 
@@ -58,7 +60,7 @@ const path = require("path")
                 if (err) {
                     reject(err)
                 }
-                await this.setSchema(options, client)
+                await setSchema(options, client)
                 resolve(client)
             })
         })
@@ -70,8 +72,9 @@ const path = require("path")
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static async createConnection(options) {
+        const setSchema = this.setSchema
         return new Promise(async function (resolve, reject) {
-            if(options.hana.encrypt){
+            if(options && options.hana && options.hana.encrypt){
                 options.hana.useTLS = true
             }
             debug(`Connection Options`, options)
@@ -83,7 +86,7 @@ const path = require("path")
                 if (err) {
                     reject(err)
                 }
-                await this.setSchema(options, client)
+                await setSchema(options, client)
                 resolve(client)
             })
         })
@@ -268,7 +271,7 @@ const path = require("path")
           if(callString === ''){
             callString += `?`
           }
-        console.log(callString)
+        //console.log(callString)
         return this.preparePromisified(`CALL ${schema}."${procedure}"(${callString})`)
     }
 

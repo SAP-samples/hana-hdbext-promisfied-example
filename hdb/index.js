@@ -44,7 +44,7 @@ export default class dbClass {
                     throw new Error(`Missing or badly formatted ${envFile}. No HANA configuration can be read or processed`)
                 }
             }
-            if(options.hana.encrypt){
+            if(options && options.hana && options.hana.encrypt){
                 options.hana.useTLS = true
             }
 
@@ -73,7 +73,7 @@ export default class dbClass {
      */
     static createConnection(options) {
         return new Promise(async function (resolve, reject) {
-            if(options.hana.encrypt){
+            if(options && options.hana && options.hana.encrypt){
                 options.hana.useTLS = true
             }
             debug(`Connection Options`, options)
