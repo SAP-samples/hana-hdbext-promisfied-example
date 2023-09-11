@@ -1,6 +1,8 @@
 // @ts-check
 import { performance, PerformanceObserver } from "perf_hooks"
 import dbClass from './index.js'
+import * as xsenv from '@sap/xsenv'
+
 //import * as hdbext from '@sap/hdbext'
 const perfObserver = new PerformanceObserver((items) => {
     items.getEntries().forEach((entry) => {
@@ -118,9 +120,30 @@ export async function test3() {
     }
 }
 
-test3()
+export async function testUps() {
+    try {
+        xsenv.loadEnv()
+        let userProvidedHanaEnv = xsenv.serviceCredentials({ label: 'user-provided' })
+        console.log("credentials for user provided")
+        console.log(userProvidedHanaEnv)
+        let connectionDetails = { hana: userProvidedHanaEnv }
+        console.log(connectionDetails.hana)
+        // let db = new dbClass(await dbClass.createConnection(dbClass.resolveEnv(null)));
+        const db = new dbClass(await dbClass.createConnection(connectionDetails))
+        const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
+                                               FROM "DUMMY"`)
+        const results = await db.statementExecPromisified(statement, [])
+        console.table(results)
+        db.destroyClient()
+    } catch (/** @type {any} */ err) {
+        console.error(`ERROR: ${err.toString()}`)
+    }
+
+}
+
 test1()
 test2()
 test2_1()
 test2_2()
-test3()
+test3() 
+testUps()
