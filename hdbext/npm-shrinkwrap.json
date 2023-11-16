@@ -10,13 +10,13 @@
             "license": "Apache-2.0",
             "dependencies": {
                 "@sap/hdbext": "^8.0.0",
-                "@sap/xsenv": "^4.0.0",
+                "@sap/xsenv": "^4.1.0",
                 "debug": "^4.3.4",
                 "dotenv": "^16.3.1"
             },
             "devDependencies": {
-                "@types/mocha": "^10.0.1",
-                "@types/node": "^20.5.9",
+                "@types/mocha": "^10.0.4",
+                "@types/node": "^20.9.0",
                 "mocha": "^10.2.0"
             },
             "engines": {
@@ -129,9 +129,9 @@
             }
         },
         "node_modules/@sap/xsenv": {
-            "version": "4.0.0",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-4.0.0.tgz",
-            "integrity": "sha512-I3otC5A+WYt/4mnbgQmY1sx9OsLjcvhmDp800zLWqNMPbYy7FmnpgZ6TbECnsNL5pU1NOSHV9CNFpomdP/FBdg==",
+            "version": "4.1.0",
+            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-4.1.0.tgz",
+            "integrity": "sha512-eeEneXg84e4X4WSPwjmejpz3YTz+3EX8BWc0u0V30OiVcpHVmN6bCj5x2xmGtauP97v/D9OYEs/4ULF2mx+/Nw==",
             "hasShrinkwrap": true,
             "dependencies": {
                 "debug": "4.3.3",
@@ -139,7 +139,7 @@
                 "verror": "1.10.0"
             },
             "engines": {
-                "node": "^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0"
+                "node": "^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0 || ^20.0.0"
             }
         },
         "node_modules/@sap/xsenv/node_modules/assert-plus": {
@@ -178,16 +178,19 @@
             }
         },
         "node_modules/@types/mocha": {
-            "version": "10.0.1",
-            "resolved": "https://registry.npmjs.org/@types/mocha/-/mocha-10.0.1.tgz",
-            "integrity": "sha512-/fvYntiO1GeICvqbQ3doGDIP97vWmvFt83GKguJ6prmQM2iXZfFcq6YE8KteFyRtX2/h5Hf91BYvPodJKFYv5Q==",
+            "version": "10.0.4",
+            "resolved": "https://registry.npmjs.org/@types/mocha/-/mocha-10.0.4.tgz",
+            "integrity": "sha512-xKU7bUjiFTIttpWaIZ9qvgg+22O1nmbA+HRxdlR+u6TWsGfmFdXrheJoK4fFxrHNVIOBDvDNKZG+LYBpMHpX3w==",
             "dev": true
         },
         "node_modules/@types/node": {
-            "version": "20.5.9",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.5.9.tgz",
-            "integrity": "sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==",
-            "dev": true
+            "version": "20.9.0",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.9.0.tgz",
+            "integrity": "sha512-nekiGu2NDb1BcVofVcEKMIwzlx4NjHlcjhoxxKBNLtz15Y1z7MYf549DFvkHSId02Ax6kGwWntIBPC3l/JZcmw==",
+            "dev": true,
+            "dependencies": {
+                "undici-types": "~5.26.4"
+            }
         },
         "node_modules/ansi-colors": {
             "version": "4.1.1",
@@ -1005,6 +1008,12 @@
             "engines": {
                 "node": ">=8.0"
             }
+        },
+        "node_modules/undici-types": {
+            "version": "5.26.5",
+            "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-5.26.5.tgz",
+            "integrity": "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==",
+            "dev": true
         },
         "node_modules/workerpool": {
             "version": "6.2.1",

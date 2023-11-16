@@ -1,24 +1,24 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202309.1",
+    "version": "2.202311.1",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdb-promisfied",
-            "version": "2.202309.1",
+            "version": "2.202311.1",
             "license": "Apache-2.0",
             "dependencies": {
-                "@sap/xsenv": "^4.0.0",
+                "@sap/xsenv": "^4.1.0",
                 "debug": "4.3.4",
                 "dotenv": "^16.3.1",
                 "hdb": "0.19.6"
             },
             "devDependencies": {
-                "@types/debug": "^4.1.8",
-                "@types/mocha": "^10.0.1",
-                "@types/node": "^20.5.9",
-                "@types/sap__xsenv": "^3.3.0",
+                "@types/debug": "^4.1.12",
+                "@types/mocha": "^10.0.4",
+                "@types/node": "^20.9.0",
+                "@types/sap__xsenv": "^3.3.2",
                 "mocha": "^10.2.0"
             },
             "engines": {
@@ -26,9 +26,9 @@
             }
         },
         "node_modules/@sap/xsenv": {
-            "version": "4.0.0",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-4.0.0.tgz",
-            "integrity": "sha512-I3otC5A+WYt/4mnbgQmY1sx9OsLjcvhmDp800zLWqNMPbYy7FmnpgZ6TbECnsNL5pU1NOSHV9CNFpomdP/FBdg==",
+            "version": "4.1.0",
+            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-4.1.0.tgz",
+            "integrity": "sha512-eeEneXg84e4X4WSPwjmejpz3YTz+3EX8BWc0u0V30OiVcpHVmN6bCj5x2xmGtauP97v/D9OYEs/4ULF2mx+/Nw==",
             "hasShrinkwrap": true,
             "dependencies": {
                 "debug": "4.3.3",
@@ -36,7 +36,7 @@
                 "verror": "1.10.0"
             },
             "engines": {
-                "node": "^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0"
+                "node": "^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0 || ^20.0.0"
             }
         },
         "node_modules/@sap/xsenv/node_modules/assert-plus": {
@@ -75,36 +75,39 @@
             }
         },
         "node_modules/@types/debug": {
-            "version": "4.1.8",
-            "resolved": "https://registry.npmjs.org/@types/debug/-/debug-4.1.8.tgz",
-            "integrity": "sha512-/vPO1EPOs306Cvhwv7KfVfYvOJqA/S/AXjaHQiJboCZzcNDb+TIJFN9/2C9DZ//ijSKWioNyUxD792QmDJ+HKQ==",
+            "version": "4.1.12",
+            "resolved": "https://registry.npmjs.org/@types/debug/-/debug-4.1.12.tgz",
+            "integrity": "sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==",
             "dev": true,
             "dependencies": {
                 "@types/ms": "*"
             }
         },
         "node_modules/@types/mocha": {
-            "version": "10.0.1",
-            "resolved": "https://registry.npmjs.org/@types/mocha/-/mocha-10.0.1.tgz",
-            "integrity": "sha512-/fvYntiO1GeICvqbQ3doGDIP97vWmvFt83GKguJ6prmQM2iXZfFcq6YE8KteFyRtX2/h5Hf91BYvPodJKFYv5Q==",
+            "version": "10.0.4",
+            "resolved": "https://registry.npmjs.org/@types/mocha/-/mocha-10.0.4.tgz",
+            "integrity": "sha512-xKU7bUjiFTIttpWaIZ9qvgg+22O1nmbA+HRxdlR+u6TWsGfmFdXrheJoK4fFxrHNVIOBDvDNKZG+LYBpMHpX3w==",
             "dev": true
         },
         "node_modules/@types/ms": {
-            "version": "0.7.31",
-            "resolved": "https://registry.npmjs.org/@types/ms/-/ms-0.7.31.tgz",
-            "integrity": "sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==",
+            "version": "0.7.34",
+            "resolved": "https://registry.npmjs.org/@types/ms/-/ms-0.7.34.tgz",
+            "integrity": "sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==",
             "dev": true
         },
         "node_modules/@types/node": {
-            "version": "20.5.9",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.5.9.tgz",
-            "integrity": "sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==",
-            "dev": true
+            "version": "20.9.0",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.9.0.tgz",
+            "integrity": "sha512-nekiGu2NDb1BcVofVcEKMIwzlx4NjHlcjhoxxKBNLtz15Y1z7MYf549DFvkHSId02Ax6kGwWntIBPC3l/JZcmw==",
+            "dev": true,
+            "dependencies": {
+                "undici-types": "~5.26.4"
+            }
         },
         "node_modules/@types/sap__xsenv": {
-            "version": "3.3.0",
-            "resolved": "https://registry.npmjs.org/@types/sap__xsenv/-/sap__xsenv-3.3.0.tgz",
-            "integrity": "sha512-oqFdRzqP82X0IIUAoYmbymeyTEvP24ff1F9UzaF/BkVRVD6cgifCsMy72mcPKDTzLcPl1i0NwAH7D0/2CmkSiQ==",
+            "version": "3.3.2",
+            "resolved": "https://registry.npmjs.org/@types/sap__xsenv/-/sap__xsenv-3.3.2.tgz",
+            "integrity": "sha512-yK6uL5yvXcMFkGjg+lWA3etJM6rQUFV3rstd118V3q0udMe5wcg+qB0poVTjKLZs4aX+n1DVrqukdRgVdwiK7g==",
             "dev": true
         },
         "node_modules/ansi-colors": {
@@ -950,6 +953,12 @@
             "engines": {
                 "node": ">=8.0"
             }
+        },
+        "node_modules/undici-types": {
+            "version": "5.26.5",
+            "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-5.26.5.tgz",
+            "integrity": "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==",
+            "dev": true
         },
         "node_modules/workerpool": {
             "version": "6.2.1",
