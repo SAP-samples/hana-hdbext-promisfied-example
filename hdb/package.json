@@ -1,6 +1,6 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202311.1",
+    "version": "2.202312.1",
     "description": "Promise wrapper for hdb without any dependency to @sap/hana-client",
     "main": "./index.cjs",
     "exports": {
@@ -30,17 +30,15 @@
         "url": "https://github.com/SAP-samples/hana-hdbext-promisfied-example"
     },
     "dependencies": {
-        "@sap/xsenv": "^4.1.0",
+        "@sap/xsenv": "^4.2.0",
         "debug": "4.3.4",
         "dotenv": "^16.3.1",
-        "hdb": "0.19.6"
+        "hdb": "0.19.7"
     },
     "devDependencies": {
         "@types/debug": "^4.1.12",
-        "@types/mocha": "^10.0.4",
         "@types/node": "^20.9.0",
-        "@types/sap__xsenv": "^3.3.2",
-        "mocha": "^10.2.0"
+        "@types/sap__xsenv": "^3.3.2"
     },
     "scripts": {
         "start": "node test",
