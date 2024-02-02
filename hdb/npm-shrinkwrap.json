@@ -1,17 +1,17 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202312.1",
+    "version": "2.202402.1",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdb-promisfied",
-            "version": "2.202312.1",
+            "version": "2.202402.1",
             "license": "Apache-2.0",
             "dependencies": {
                 "@sap/xsenv": "^4.2.0",
                 "debug": "4.3.4",
-                "dotenv": "^16.3.1",
+                "dotenv": "^16.4.1",
                 "hdb": "0.19.7"
             },
             "devDependencies": {
@@ -88,9 +88,9 @@
             "dev": true
         },
         "node_modules/@types/node": {
-            "version": "20.10.4",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.10.4.tgz",
-            "integrity": "sha512-D08YG6rr8X90YB56tSIuBaddy/UXAA9RKJoFvrsnogAum/0pmjkgi4+2nx96A330FmioegBWmEYQ+syqCFaveg==",
+            "version": "20.11.16",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.11.16.tgz",
+            "integrity": "sha512-gKb0enTmRCzXSSUJDq6/sPcqrfCv2mkkG6Jt/clpn5eiCbKTY+SgZUxo+p8ZKMof5dCp9vHQUAB7wOUTod22wQ==",
             "dev": true,
             "dependencies": {
                 "undici-types": "~5.26.4"
@@ -119,9 +119,9 @@
             }
         },
         "node_modules/dotenv": {
-            "version": "16.3.1",
-            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.3.1.tgz",
-            "integrity": "sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==",
+            "version": "16.4.1",
+            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.4.1.tgz",
+            "integrity": "sha512-CjA3y+Dr3FyFDOAMnxZEGtnW9KBR2M0JvvUtXNW+dYJL5ROWxP9DUHCwgFqpMk0OXCc0ljhaNTr2w/kutYIcHQ==",
             "engines": {
                 "node": ">=12"
             },
