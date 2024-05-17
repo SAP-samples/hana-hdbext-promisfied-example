@@ -1,12 +1,12 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202404.2",
+    "version": "2.202405.1",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdbext-promisfied",
-            "version": "2.202404.2",
+            "version": "2.202405.1",
             "license": "Apache-2.0",
             "dependencies": {
                 "@sap/hdbext": "^8.0.3",
@@ -15,7 +15,7 @@
                 "dotenv": "^16.4.5"
             },
             "devDependencies": {
-                "@types/node": "^20.9.0"
+                "@types/node": "^20.12.12"
             },
             "engines": {
                 "node": ">=14.18.0"
@@ -140,9 +140,9 @@
             }
         },
         "node_modules/@types/node": {
-            "version": "20.12.6",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.12.6.tgz",
-            "integrity": "sha512-3KurE8taB8GCvZBPngVbp0lk5CKi8M9f9k1rsADh0Evdz5SzJ+Q+Hx9uHoFGsLnLnd1xmkDQr2hVhlA0Mn0lKQ==",
+            "version": "20.12.12",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-20.12.12.tgz",
+            "integrity": "sha512-eWLDGF/FOSPtAvEqeRAQ4C8LSA7M1I7i0ky1I8U7kD1J5ITyW3AsRhQrKVoWf5pFKZ2kILsEGJhsI9r93PYnOw==",
             "dev": true,
             "dependencies": {
                 "undici-types": "~5.26.4"
