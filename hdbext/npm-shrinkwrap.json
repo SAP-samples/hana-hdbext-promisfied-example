@@ -1,35 +1,35 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202410.1",
+    "version": "2.202503.1",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdbext-promisfied",
-            "version": "2.202410.1",
+            "version": "2.202503.1",
             "license": "Apache-2.0",
             "dependencies": {
-                "@sap/hdbext": "^8.0.8",
-                "@sap/xsenv": "^5.4.0",
-                "debug": "^4.3.7",
-                "dotenv": "^16.4.5"
+                "@sap/hdbext": "^8.1.3",
+                "@sap/xsenv": "^5.5.0",
+                "debug": "^4.4.0",
+                "dotenv": "^16.4.7"
             },
             "devDependencies": {
-                "@types/node": "^22.8.1"
+                "@types/node": "^22.13.10"
             },
             "engines": {
                 "node": ">=14.18.0"
             }
         },
         "node_modules/@sap/hdbext": {
-            "version": "8.0.8",
-            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-8.0.8.tgz",
-            "integrity": "sha512-NwhdluEndZwPMX2dsxnWJ2XElQ4Is9m/Mge0yaTcgmMWVeKip1sYIwGAlep7uHoVt4feWY4y4f5fB9qAp2e9gg==",
+            "version": "8.1.3",
+            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-8.1.3.tgz",
+            "integrity": "sha512-3DCkcOMPbwiGsbIBmLiok1nPCt3pCoTHh91rhiH9l5S/Ol1pG99RQXFYv85hRzjFGH57QiqixrLQ2nC37BQxRA==",
             "hasShrinkwrap": true,
             "license": "SEE LICENSE IN LICENSE file",
             "dependencies": {
-                "@sap/e2e-trace": "^4.1.0",
-                "@sap/hana-client": "2.22.29",
+                "@sap/e2e-trace": "5.3.0",
+                "@sap/hana-client": "2.23.24",
                 "accept-language": "2.0.16",
                 "async": "3.2.6",
                 "debug": "4.3.1",
@@ -37,42 +37,17 @@
                 "verror": "1.10.0"
             },
             "engines": {
-                "node": "^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0 || ^20.0.0"
+                "node": "^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0 || ^20.0.0 || ^22.x"
             }
         },
         "node_modules/@sap/hdbext/node_modules/@sap/e2e-trace": {
-            "version": "4.1.0",
+            "version": "5.3.0",
             "dependencies": {
                 "request-stats": "3.0.0"
             }
         },
-        "node_modules/@sap/hdbext/node_modules/@sap/e2e-trace/node_modules/http-headers": {
-            "version": "3.0.2",
-            "dependencies": {
-                "next-line": "^1.1.0"
-            }
-        },
-        "node_modules/@sap/hdbext/node_modules/@sap/e2e-trace/node_modules/next-line": {
-            "version": "1.1.0"
-        },
-        "node_modules/@sap/hdbext/node_modules/@sap/e2e-trace/node_modules/once": {
-            "version": "1.4.0",
-            "dependencies": {
-                "wrappy": "1"
-            }
-        },
-        "node_modules/@sap/hdbext/node_modules/@sap/e2e-trace/node_modules/request-stats": {
-            "version": "3.0.0",
-            "dependencies": {
-                "http-headers": "^3.0.1",
-                "once": "^1.4.0"
-            }
-        },
-        "node_modules/@sap/hdbext/node_modules/@sap/e2e-trace/node_modules/wrappy": {
-            "version": "1.0.2"
-        },
         "node_modules/@sap/hdbext/node_modules/@sap/hana-client": {
-            "version": "2.22.29",
+            "version": "2.23.24",
             "dependencies": {
                 "debug": "3.1.0"
             }
@@ -113,11 +88,33 @@
         "node_modules/@sap/hdbext/node_modules/extsprintf": {
             "version": "1.4.1"
         },
+        "node_modules/@sap/hdbext/node_modules/http-headers": {
+            "version": "3.0.2",
+            "dependencies": {
+                "next-line": "^1.1.0"
+            }
+        },
         "node_modules/@sap/hdbext/node_modules/lodash": {
             "version": "4.17.21"
         },
         "node_modules/@sap/hdbext/node_modules/ms": {
             "version": "2.1.2"
+        },
+        "node_modules/@sap/hdbext/node_modules/next-line": {
+            "version": "1.1.0"
+        },
+        "node_modules/@sap/hdbext/node_modules/once": {
+            "version": "1.4.0",
+            "dependencies": {
+                "wrappy": "1"
+            }
+        },
+        "node_modules/@sap/hdbext/node_modules/request-stats": {
+            "version": "3.0.0",
+            "dependencies": {
+                "http-headers": "^3.0.1",
+                "once": "^1.4.0"
+            }
         },
         "node_modules/@sap/hdbext/node_modules/verror": {
             "version": "1.10.0",
@@ -127,13 +124,16 @@
                 "extsprintf": "^1.2.0"
             }
         },
+        "node_modules/@sap/hdbext/node_modules/wrappy": {
+            "version": "1.0.2"
+        },
         "node_modules/@sap/xsenv": {
-            "version": "5.4.0",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-5.4.0.tgz",
-            "integrity": "sha512-O9G71v7S1ZHorDHwNGAbZXmvRvALbeN8Q/j1UgQdKfUcf18re+5CZxKCVUezs2OTBR2KB/tvDFLnlXwHYuwC7A==",
+            "version": "5.5.0",
+            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-5.5.0.tgz",
+            "integrity": "sha512-+FIpnXjDrgtJaN6AxjDRIc5ONd4Yt5UarCqqzRiZjvJaknnkT+b6/ho/va/rg8UdiCAVxn8c4vMVhgjXGc/gmQ==",
             "license": "SEE LICENSE IN LICENSE file",
             "dependencies": {
-                "debug": "4.3.7",
+                "debug": "4.4.0",
                 "node-cache": "^5.1.2",
                 "verror": "1.10.1"
             },
@@ -142,13 +142,13 @@
             }
         },
         "node_modules/@types/node": {
-            "version": "22.8.1",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-22.8.1.tgz",
-            "integrity": "sha512-k6Gi8Yyo8EtrNtkHXutUu2corfDf9su95VYVP10aGYMMROM6SAItZi0w1XszA6RtWTHSVp5OeFof37w0IEqCQg==",
+            "version": "22.13.10",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-22.13.10.tgz",
+            "integrity": "sha512-I6LPUvlRH+O6VRUqYOcMudhaIdUVWfsjnZavnsraHvpBwaEyMN29ry+0UVJhImYL16xsscu0aske3yA+uPOWfw==",
             "dev": true,
             "license": "MIT",
             "dependencies": {
-                "undici-types": "~6.19.8"
+                "undici-types": "~6.20.0"
             }
         },
         "node_modules/assert-plus": {
@@ -176,9 +176,9 @@
             "license": "MIT"
         },
         "node_modules/debug": {
-            "version": "4.3.7",
-            "resolved": "https://registry.npmjs.org/debug/-/debug-4.3.7.tgz",
-            "integrity": "sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==",
+            "version": "4.4.0",
+            "resolved": "https://registry.npmjs.org/debug/-/debug-4.4.0.tgz",
+            "integrity": "sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==",
             "license": "MIT",
             "dependencies": {
                 "ms": "^2.1.3"
@@ -193,9 +193,9 @@
             }
         },
         "node_modules/dotenv": {
-            "version": "16.4.5",
-            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.4.5.tgz",
-            "integrity": "sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==",
+            "version": "16.4.7",
+            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.4.7.tgz",
+            "integrity": "sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==",
             "license": "BSD-2-Clause",
             "engines": {
                 "node": ">=12"
@@ -232,9 +232,9 @@
             }
         },
         "node_modules/undici-types": {
-            "version": "6.19.8",
-            "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-6.19.8.tgz",
-            "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==",
+            "version": "6.20.0",
+            "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-6.20.0.tgz",
+            "integrity": "sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==",
             "dev": true,
             "license": "MIT"
         },
