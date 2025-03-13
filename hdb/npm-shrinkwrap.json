@@ -1,12 +1,12 @@
 {
     "name": "sap-hdb-promisfied",
-    "version": "2.202410.1",
+    "version": "2.202503.1",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdb-promisfied",
-            "version": "2.202410.1",
+            "version": "2.202503.1",
             "license": "Apache-2.0",
             "dependencies": {
                 "@sap/xsenv": "^5.5.0",
