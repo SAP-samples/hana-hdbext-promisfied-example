@@ -9,24 +9,24 @@ With the standard @sap/hdbext you use nested events and callbacks like this:
 ```JavaScript
 let client = req.db;
 client.prepare(
-	`SELECT SESSION_USER, CURRENT_SCHEMA 
-	    FROM "DUMMY"`,
-	(err, statement) => {
-		if (err) {
-			return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
-		}
-		statement.exec([], (err, results) => {
-			if (err) {
-				return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
-			} else {
-				var result = JSON.stringify({
-					Objects: results
-				});
-				return res.type("application/json").status(200).send(result);
-			}
-		});
-		return null;
-	});
+ `SELECT SESSION_USER, CURRENT_SCHEMA 
+     FROM "DUMMY"`,
+ (err, statement) => {
+  if (err) {
+   return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
+  }
+  statement.exec([], (err, results) => {
+   if (err) {
+    return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
+   } else {
+    var result = JSON.stringify({
+     Objects: results
+    });
+    return res.type("application/json").status(200).send(result);
+   }
+  });
+  return null;
+ });
 ```
 
 However this module wraps the major features of @sap/hdbext in a ES6 class and returns promises. Therefore you could re-write the above block using the easier to read and maintain promise based approach.  You just pass in an instance of the HANA Client @sap/hdbext module. In this example its a typical example that gets the HANA client as Express Middelware (req.db):
@@ -35,39 +35,39 @@ However this module wraps the major features of @sap/hdbext in a ES6 class and r
 const dbClass = require("sap-hdbext-promisfied")
 let db = new dbClass(req.db)
 db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
-				            FROM "DUMMY"`)
-	.then(statement => {
-		db.statementExecPromisified(statement, [])
-			.then(results => {
-				let result = JSON.stringify({
-					Objects: results
-				})
-				return res.type("application/json").status(200).send(result)
-			})
-			.catch(err => {
-				return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
-			})
-	})
-	.catch(err => {
-		return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
-	})
+                FROM "DUMMY"`)
+ .then(statement => {
+  db.statementExecPromisified(statement, [])
+   .then(results => {
+    let result = JSON.stringify({
+     Objects: results
+    })
+    return res.type("application/json").status(200).send(result)
+   })
+   .catch(err => {
+    return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
+   })
+ })
+ .catch(err => {
+  return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
+ })
 ```
 
 Or better yet if you are running Node.js 8.x or higher you can use the new AWAIT feature and the code is even more streamlined:
 
 ```JavaScript
 try {
-	const dbClass = require("sap-hdbext-promisfied")
-	let db = new dbClass(req.db);
-	const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
-				            							FROM "DUMMY"`)
-	const results = await db.statementExecPromisified(statement, [])
-	let result = JSON.stringify({
-		Objects: results
-	})
-	return res.type("application/json").status(200).send(result)
+ const dbClass = require("sap-hdbext-promisfied")
+ let db = new dbClass(req.db);
+ const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
+                       FROM "DUMMY"`)
+ const results = await db.statementExecPromisified(statement, [])
+ let result = JSON.stringify({
+  Objects: results
+ })
+ return res.type("application/json").status(200).send(result)
 } catch (e) {
-	return res.type("text/plain").status(500).send(`ERROR: ${e.toString()}`)
+ return res.type("text/plain").status(500).send(`ERROR: ${e.toString()}`)
 }
 ```
 
@@ -117,7 +117,7 @@ objectName(name)
 
 * Install Node.js version 12.x or 14.x on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 
-* @sap Node.js packages have moved from https://npm.sap.com to the default registry https://registry.npmjs.org. As future versions of @sap modules are going to be published only there, please make sure to adjust your registry with:
+* @sap Node.js packages have moved from [https://npm.sap.com](https://npm.sap.com]) to the default registry <https://registry.npmjs.org>. As future versions of @sap modules are going to be published only there, please make sure to adjust your registry with:
 
 ```shell
 npm config delete @sap:registry
@@ -143,5 +143,4 @@ This project is provided "as-is": there is no guarantee that raised issues will 
 
 ## License
 
-Copyright (c) 2024 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSES/Apache-2.0.txt) file.
-
+Copyright (c) 2025 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSES/Apache-2.0.txt) file.
