@@ -47,6 +47,6 @@
         "test": "mocha './tests/*.Test.js' --parallel --timeout 5000"
     },
     "engines": {
-        "node": ">= 0.12"
+        "node": ">= 18.18.0"
     }
 }
