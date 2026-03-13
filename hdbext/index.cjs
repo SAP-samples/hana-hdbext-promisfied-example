@@ -3,6 +3,13 @@
 // @ts-check
 "use strict";
 const debug = require('debug')('hdbext-promisified')
+const { promisify } = require('util')
+const hdbextModule = require("@sap/hdbext")
+const dotenv = require('dotenv')
+const xsenv = require("@sap/xsenv")
+const path = require("path")
+
+const promiseLoadProcedure = promisify(hdbextModule.loadProcedure)
 
 /**
  * @module sap-hdbext-promisfied - promises version of sap/hdbext
@@ -17,8 +24,7 @@ module.exports = class {
      */
     static createConnectionFromEnv(envFile) {
         return new Promise((resolve, reject) => {
-            require('dotenv').config()
-            const xsenv = require("@sap/xsenv")
+            dotenv.config()
             xsenv.loadEnv(envFile)
 
             /** @type any */
@@ -38,15 +44,14 @@ module.exports = class {
                 }
             }
             debug(`Connection Options`, options)
-            var hdbext = require("@sap/hdbext")
             options.hana.pooling = true
-            hdbext.createConnection(options.hana, (error, client) => {
+            hdbextModule.createConnection(options.hana, ((/** @type {any} */ error, /** @type {any} */ client) => {
                 if (error) {
                     reject(error)
                 } else {
                     resolve(client)
                 }
-            })
+            }))
         })
     }
 
@@ -57,17 +62,15 @@ module.exports = class {
      */
     static createConnection(options) {
         return new Promise((resolve, reject) => {
-            var hdbext = require("@sap/hdbext")
-
             options.pooling = true
             debug(`Connection Options`, options)
-            hdbext.createConnection(options, (error, client) => {
+            hdbextModule.createConnection(options, ((/** @type {any} */ error, /** @type {any} */ client) => {
                 if (error) {
                     reject(error)
                 } else {
                     resolve(client)
                 }
-            })
+            }))
         })
     }
 
@@ -77,7 +80,6 @@ module.exports = class {
      * @returns string - default env file name and path
      */
     static resolveEnv(options) {
-        let path = require("path")
         let file = 'default-env.json'
         if (options && options.hasOwnProperty('admin') && options.admin) {
             file = 'default-env-admin.json'
@@ -125,12 +127,11 @@ module.exports = class {
 
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type sap/hdbext 
+      * @param {any} client - HANA DB Client instance of type sap/hdbext 
      */
     constructor(client) {
         this.client = client
-        this.util = require("util")
-        this.client.promisePrepare = this.util.promisify(this.client.prepare)
+        this.client.promisePrepare = promisify(this.client.prepare)
     }
 
     /**
@@ -150,7 +151,7 @@ module.exports = class {
      * @returns {Promise<any>} - resultset 
      */
     statementExecBatchPromisified(statement, parameters) {
-        statement.promiseExecBatch = this.util.promisify(statement.execBatch)
+        if (!statement.promiseExecBatch) statement.promiseExecBatch = promisify(statement.execBatch)
         return statement.promiseExecBatch(parameters)
     }
 
@@ -161,7 +162,7 @@ module.exports = class {
      * @returns {Promise<any>} - resultset 
      */
     statementExecPromisified(statement, parameters) {
-        statement.promiseExec = this.util.promisify(statement.exec)
+        if (!statement.promiseExec) statement.promiseExec = promisify(statement.exec)
         return statement.promiseExec(parameters)
     }    
 
@@ -173,8 +174,7 @@ module.exports = class {
      * @returns {Promise<function>} - proxy function
      */
     loadProcedurePromisified(hdbext, schema, procedure) {
-        hdbext.promiseLoadProcedure = this.util.promisify(hdbext.loadProcedure)
-        return hdbext.promiseLoadProcedure(this.client, schema, procedure)
+        return promiseLoadProcedure(this.client, schema, procedure)
     }
 
     /**
@@ -182,22 +182,9 @@ module.exports = class {
      * @param {string} sql - SQL Statement
      * @returns {Promise<any>} - result set object
      */
-    execSQL(sql) {
-        return new Promise((resolve, reject) => {
-            this.preparePromisified(sql)
-                .then(statement => {
-                    this.statementExecPromisified(statement, [])
-                        .then(results => {
-                            resolve(results)
-                        })
-                        .catch(err => {
-                            reject(err)
-                        });
-                })
-                .catch(err => {
-                    reject(err)
-                })
-        })
+    async execSQL(sql) {
+        const statement = await this.preparePromisified(sql)
+        return this.statementExecPromisified(statement, [])
     }
 
     /**
@@ -208,7 +195,7 @@ module.exports = class {
      */
     callProcedurePromisified(storedProc, inputParams) {
         return new Promise((resolve, reject) => {
-            storedProc(inputParams, (error, outputScalar, ...results) => {
+            storedProc(inputParams, ((/** @type {any} */ error, /** @type {any} */ outputScalar, /** @type {any[]} */ ...results) => {
                 if (error) {
                     reject(error)
                 } else {
@@ -218,6 +205,7 @@ module.exports = class {
                             results: results[0]
                         })
                     } else {
+                        /** @type {any} */
                         let output = {};
                         output.outputScalar = outputScalar;
                         for (let i = 0; i < results.length; i++) {
@@ -226,7 +214,7 @@ module.exports = class {
                         resolve(output)
                     }
                 }
-            })
+            }))
         })
     }
 

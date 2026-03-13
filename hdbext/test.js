@@ -20,22 +20,22 @@ export async function test1() {
             let db = new dbClass(client)
             db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
                              FROM "DUMMY"`)
-                .then(statement => {
+                .then((/** @type {any} */ statement) => {
                     db.statementExecPromisified(statement, [])
                         .then(results => {
                             console.table(results)
                             performance.mark("1-end")
                             performance.measure("Test #1", "1-start", "1-end")
                         })
-                        .catch(err => {
+                        .catch((/** @type {any} */ err) => {
                             console.error(`ERROR: ${err.toString()}`)
                         })
                 })
-                .catch(err => {
+                .catch((/** @type {any} */ err) => {
                     console.error(`ERROR: ${err.toString()}`)
                 })
         })
-        .catch(err => {
+        .catch((/** @type {any} */ err) => {
             console.error(`ERROR: ${err.toString()}`)
         })
 }
@@ -55,7 +55,7 @@ export async function test2() {
         performance.mark("2-end")
         performance.measure("Test #2", "2-start", "2-end")
     } catch (err) {
-        console.error(`ERROR: ${err.toString()}`)
+        console.error(`ERROR: ${String(err)}`)
     }
 }
 
@@ -75,7 +75,7 @@ export async function test2() {
         performance.mark("3-end")
         performance.measure("Test #3", "3-start", "3-end")
     } catch (err) {
-        console.error(`ERROR: ${err.toString()}`)
+        console.error(`ERROR: ${String(err)}`)
     }
 }
 

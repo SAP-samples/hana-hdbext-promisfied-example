@@ -16,6 +16,25 @@ import { promisify } from 'util'
  * @module sap-hdb-promisfied - promises version of hdb
  */
 
+const sqlProcedureMetadata = "SELECT \
+          PARAMS.PARAMETER_NAME,           \
+          PARAMS.DATA_TYPE_NAME,           \
+          PARAMS.PARAMETER_TYPE,           \
+          PARAMS.HAS_DEFAULT_VALUE,        \
+          PARAMS.IS_INPLACE_TYPE,          \
+          PARAMS.TABLE_TYPE_SCHEMA,        \
+          PARAMS.TABLE_TYPE_NAME,          \
+                                           \
+          CASE WHEN SYNONYMS.OBJECT_NAME IS NULL THEN 'FALSE' ELSE 'TRUE' END AS IS_TABLE_TYPE_SYNONYM,         \
+          IFNULL(SYNONYMS.OBJECT_SCHEMA, '') AS OBJECT_SCHEMA,                                                  \
+          IFNULL(SYNONYMS.OBJECT_NAME, '') AS OBJECT_NAME                                                       \
+                                                                                                                \
+          FROM SYS.PROCEDURE_PARAMETERS AS PARAMS                                                               \
+          LEFT JOIN SYS.SYNONYMS AS SYNONYMS                                                                    \
+          ON SYNONYMS.SCHEMA_NAME = PARAMS.TABLE_TYPE_SCHEMA AND SYNONYMS.SYNONYM_NAME = PARAMS.TABLE_TYPE_NAME \
+          WHERE PARAMS.SCHEMA_NAME = ? AND PARAMS.PROCEDURE_NAME = ?                                            \
+          ORDER BY PARAMS.POSITION"
+
 export default class dbClass {
 
     /**
@@ -72,7 +91,7 @@ export default class dbClass {
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
     static createConnection(options) {
-        return new Promise(async function (resolve, reject) {
+        return new Promise((resolve, reject) => {
             if(options && options.hana && options.hana.encrypt){
                 options.hana.useTLS = true
             }
@@ -81,12 +100,12 @@ export default class dbClass {
             client.on('error', (/** @type {any} */ err) => {
                 reject(err)
             })
-            client.connect(async (/** @type {any} */ err) => {
+            client.connect((/** @type {any} */ err) => {
                 if (err) {
                     reject(err)
+                    return
                 }
-                await dbClass.setSchema(options, client)
-                resolve(client)
+                dbClass.setSchema(options, client).then(() => resolve(client)).catch(reject)
             })
         })
     }
@@ -150,24 +169,6 @@ export default class dbClass {
      * @returns {Promise<any>} - Result Set  
      */
     static async fetchSPMetadata(db, procInfo) {
-        var sqlProcedureMetadata = "SELECT \
-          PARAMS.PARAMETER_NAME,           \
-          PARAMS.DATA_TYPE_NAME,           \
-          PARAMS.PARAMETER_TYPE,           \
-          PARAMS.HAS_DEFAULT_VALUE,        \
-          PARAMS.IS_INPLACE_TYPE,          \
-          PARAMS.TABLE_TYPE_SCHEMA,        \
-          PARAMS.TABLE_TYPE_NAME,          \
-                                           \
-          CASE WHEN SYNONYMS.OBJECT_NAME IS NULL THEN 'FALSE' ELSE 'TRUE' END AS IS_TABLE_TYPE_SYNONYM,         \
-          IFNULL(SYNONYMS.OBJECT_SCHEMA, '') AS OBJECT_SCHEMA,                                                  \
-          IFNULL(SYNONYMS.OBJECT_NAME, '') AS OBJECT_NAME                                                       \
-                                                                                                                \
-          FROM SYS.PROCEDURE_PARAMETERS AS PARAMS                                                               \
-          LEFT JOIN SYS.SYNONYMS AS SYNONYMS                                                                    \
-          ON SYNONYMS.SCHEMA_NAME = PARAMS.TABLE_TYPE_SCHEMA AND SYNONYMS.SYNONYM_NAME = PARAMS.TABLE_TYPE_NAME \
-          WHERE PARAMS.SCHEMA_NAME = ? AND PARAMS.PROCEDURE_NAME = ?                                            \
-          ORDER BY PARAMS.POSITION"
         return await db.statementExecPromisified(await db.preparePromisified(sqlProcedureMetadata), [procInfo.schema, procInfo.name])
     }
 
@@ -187,7 +188,7 @@ export default class dbClass {
 
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type hdb
+     * @param {any} client - HANA DB Client instance of type hdb
      */
     constructor(client) {
         this.client = client
@@ -232,7 +233,7 @@ export default class dbClass {
      * @returns {Promise<any>} - resultset 
      */
     statementExecBatchPromisified(statement, parameters) {
-        statement.promiseExecBatch = promisify(statement.execBatch)
+        if (!statement.promiseExecBatch) statement.promiseExecBatch = promisify(statement.execBatch)
         return statement.promiseExecBatch(parameters)
     }
 
@@ -243,7 +244,7 @@ export default class dbClass {
      * @returns {Promise<any>} - resultset 
      */
     statementExecPromisified(statement, parameters) {
-        statement.promiseExec = promisify(statement.exec)
+        if (!statement.promiseExec) statement.promiseExec = promisify(statement.exec)
         return statement.promiseExec(parameters)
     }
 
@@ -276,22 +277,9 @@ export default class dbClass {
      * @param {string} sql - SQL Statement
      * @returns {Promise<any>} - result set object
      */
-    execSQL(sql) {
-        return new Promise((resolve, reject) => {
-            this.preparePromisified(sql)
-                .then((/** @type {any} */ statement) => {
-                    this.statementExecPromisified(statement, [])
-                        .then(results => {
-                            resolve(results)
-                        })
-                        .catch(err => {
-                            reject(err)
-                        });
-                })
-                .catch((/** @type {any} */ err) => {
-                    reject(err)
-                })
-        })
+    async execSQL(sql) {
+        const statement = await this.preparePromisified(sql)
+        return this.statementExecPromisified(statement, [])
     }
 
     /**

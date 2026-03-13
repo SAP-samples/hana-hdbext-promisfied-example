@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export = exports;
 declare class exports {
     /**
@@ -33,9 +32,9 @@ declare class exports {
     static objectName(name: string): string;
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type hdb
+     * @param {any} client - HANA DB Client instance of type hdb
      */
-    constructor(client: object);
+    constructor(client: any);
     /**
      * Calculation the current schema name
      * @param {any} options - Input options or parameters
@@ -51,7 +50,6 @@ declare class exports {
      */
     fetchSPMetadata(db: any, procInfo: any): Promise<any>;
     client: any;
-    util: typeof import("util");
     /**
      * Destroy Client
      */

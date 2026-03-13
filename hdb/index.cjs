@@ -14,6 +14,27 @@ const path = require("path")
  * @module sap-hdb-promisfied - promises version of hdb
  */
 
+const { promisify } = require("util")
+
+const sqlProcedureMetadata = "SELECT \
+          PARAMS.PARAMETER_NAME,           \
+          PARAMS.DATA_TYPE_NAME,           \
+          PARAMS.PARAMETER_TYPE,           \
+          PARAMS.HAS_DEFAULT_VALUE,        \
+          PARAMS.IS_INPLACE_TYPE,          \
+          PARAMS.TABLE_TYPE_SCHEMA,        \
+          PARAMS.TABLE_TYPE_NAME,          \
+                                           \
+          CASE WHEN SYNONYMS.OBJECT_NAME IS NULL THEN 'FALSE' ELSE 'TRUE' END AS IS_TABLE_TYPE_SYNONYM,         \
+          IFNULL(SYNONYMS.OBJECT_SCHEMA, '') AS OBJECT_SCHEMA,                                                  \
+          IFNULL(SYNONYMS.OBJECT_NAME, '') AS OBJECT_NAME                                                       \
+                                                                                                                \
+          FROM SYS.PROCEDURE_PARAMETERS AS PARAMS                                                               \
+          LEFT JOIN SYS.SYNONYMS AS SYNONYMS                                                                    \
+          ON SYNONYMS.SCHEMA_NAME = PARAMS.TABLE_TYPE_SCHEMA AND SYNONYMS.SYNONYM_NAME = PARAMS.TABLE_TYPE_NAME \
+          WHERE PARAMS.SCHEMA_NAME = ? AND PARAMS.PROCEDURE_NAME = ?                                            \
+          ORDER BY PARAMS.POSITION"
+
  module.exports = class {
 
     /**
@@ -71,9 +92,9 @@ const path = require("path")
      * @param {any} options - Input options or parameters
      * @returns {Promise<any>} - HANA Client instance of hdb
      */
-    static async createConnection(options) {
+    static createConnection(options) {
         const setSchema = this.setSchema
-        return new Promise(async function (resolve, reject) {
+        return new Promise((resolve, reject) => {
             if(options && options.hana && options.hana.encrypt){
                 options.hana.useTLS = true
             }
@@ -82,12 +103,12 @@ const path = require("path")
             client.on('error', (/** @type {any} */ err) => {
                 reject(err)
             })
-            client.connect(async (/** @type {any} */ err) => {
+            client.connect((/** @type {any} */ err) => {
                 if (err) {
                     reject(err)
+                    return
                 }
-                await setSchema(options, client)
-                resolve(client)
+                setSchema(options, client).then(() => resolve(client)).catch(reject)
             })
         })
     }
@@ -151,24 +172,6 @@ const path = require("path")
      * @returns {Promise<any>} - Result Set  
      */    
     async fetchSPMetadata(db, procInfo) {
-        var sqlProcedureMetadata = "SELECT \
-          PARAMS.PARAMETER_NAME,           \
-          PARAMS.DATA_TYPE_NAME,           \
-          PARAMS.PARAMETER_TYPE,           \
-          PARAMS.HAS_DEFAULT_VALUE,        \
-          PARAMS.IS_INPLACE_TYPE,          \
-          PARAMS.TABLE_TYPE_SCHEMA,        \
-          PARAMS.TABLE_TYPE_NAME,          \
-                                           \
-          CASE WHEN SYNONYMS.OBJECT_NAME IS NULL THEN 'FALSE' ELSE 'TRUE' END AS IS_TABLE_TYPE_SYNONYM,         \
-          IFNULL(SYNONYMS.OBJECT_SCHEMA, '') AS OBJECT_SCHEMA,                                                  \
-          IFNULL(SYNONYMS.OBJECT_NAME, '') AS OBJECT_NAME                                                       \
-                                                                                                                \
-          FROM SYS.PROCEDURE_PARAMETERS AS PARAMS                                                               \
-          LEFT JOIN SYS.SYNONYMS AS SYNONYMS                                                                    \
-          ON SYNONYMS.SCHEMA_NAME = PARAMS.TABLE_TYPE_SCHEMA AND SYNONYMS.SYNONYM_NAME = PARAMS.TABLE_TYPE_NAME \
-          WHERE PARAMS.SCHEMA_NAME = ? AND PARAMS.PROCEDURE_NAME = ?                                            \
-          ORDER BY PARAMS.POSITION"
         return await db.statementExecPromisified(await db.preparePromisified(sqlProcedureMetadata), [procInfo.schema, procInfo.name])
       }
 
@@ -188,13 +191,12 @@ const path = require("path")
 
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type hdb
+     * @param {any} client - HANA DB Client instance of type hdb
      */
     constructor(client) {
         this.client = client
         // @ts-ignore
-        this.util = require("util")
-        this.client.promisePrepare = this.util.promisify(this.client.prepare)
+        this.client.promisePrepare = promisify(this.client.prepare)
     }
 
     /**
@@ -234,7 +236,7 @@ const path = require("path")
      * @returns {Promise<any>} - resultset 
      */
     statementExecBatchPromisified(statement, parameters) {
-        statement.promiseExecBatch = this.util.promisify(statement.execBatch)
+        if (!statement.promiseExecBatch) statement.promiseExecBatch = promisify(statement.execBatch)
         return statement.promiseExecBatch(parameters)
     }
 
@@ -245,7 +247,7 @@ const path = require("path")
      * @returns {Promise<any>} - resultset 
      */
     statementExecPromisified(statement, parameters) {
-        statement.promiseExec = this.util.promisify(statement.exec)
+        if (!statement.promiseExec) statement.promiseExec = promisify(statement.exec)
         return statement.promiseExec(parameters)
     }
 
@@ -281,22 +283,9 @@ const path = require("path")
      * @param {string} sql - SQL Statement
      * @returns {Promise<any>} - result set object
      */
-    execSQL(sql) {
-        return new Promise((resolve, reject) => {
-            this.preparePromisified(sql)
-                .then((/** @type {any} */ statement) => {
-                    this.statementExecPromisified(statement, [])
-                        .then(results => {
-                            resolve(results)
-                        })
-                        .catch(err => {
-                            reject(err)
-                        });
-                })
-                .catch((/** @type {any} */ err) => {
-                    reject(err)
-                })
-        })
+    async execSQL(sql) {
+        const statement = await this.preparePromisified(sql)
+        return this.statementExecPromisified(statement, [])
     }
 
     /**

@@ -19,6 +19,8 @@
     "target": "ES2020",
     "moduleResolution": "Node",
     "module": "es2020",
-    "types": ["node", "mocha"]
+    "types": ["node", "mocha"],
+    "forceConsistentCasingInFileNames": true,
+    "strict": true
   }
 }

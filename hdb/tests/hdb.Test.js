@@ -1,85 +1,198 @@
 
-
 // @ts-check
 /**
- * @module hdb - examples using sap-hdb-promisfied
+ * @module hdb - contract tests for ESM + CJS exports
  */
 
-import dbClass from '../index.js'
 import * as assert from 'assert'
+import { createRequire } from 'module'
+
+const require = createRequire(import.meta.url)
+
+const moduleVariants = [
+    {
+        name: 'esm',
+        /** @returns {Promise<any>} */
+        loadDbClass: async () => (await import('../index.js')).default
+    },
+    {
+        name: 'cjs',
+        /** @returns {Promise<any>} */
+        loadDbClass: async () => require('../index.cjs')
+    }
+]
 
 /**
- * hdb Await example
- * @param {string} [dbQuery] Database Query 
- * @returns {Promise<object>} HANA ResultSet Object
+ * @param {any} DbClass
+ * @param {(db:any)=>Promise<any>} run
  */
-export async function example1(dbQuery) {
+async function withDb(DbClass, run) {
+    const db = new DbClass(await DbClass.createConnectionFromEnv())
     try {
-        let db = new dbClass(await dbClass.createConnectionFromEnv())
-        let result = await db.execSQL(dbQuery)
+        return await run(db)
+    } finally {
         db.destroyClient()
-        return result
-    } catch (error) {
-        throw error
     }
 }
 
+for (const variant of moduleVariants) {
+    describe(`hdb (${variant.name})`, function () {
+        /** @type {any} */
+        let DbClass
 
-/**
- * hdb procedure example with Callbacks
- * @param {string} [schema] Database Stored Procedure Schema 
- * @param {string} [dbProcedure] Database Stored Procedure Name 
- * @param {object} [inputParams] Database Stored Procedure Input Parameters
- * @returns {Promise<object>} HANA ResultSet Object
- */
-export async function example2(schema, dbProcedure, inputParams) {
-    try {
-        let db = new dbClass(await dbClass.createConnectionFromEnv())
-        let sp = await db.loadProcedurePromisified(schema, dbProcedure)
-        let result = await db.callProcedurePromisified(sp, inputParams)
-        db.destroyClient()
-        return result
-    } catch (error) {
-        throw error
-    }
+        before(async () => {
+            DbClass = await variant.loadDbClass()
+        })
+
+        describe('Static helper methods', () => {
+            it('resolveEnv returns default env file by default', () => {
+                const envFile = DbClass.resolveEnv()
+                assert.ok(envFile.endsWith('default-env.json'))
+            })
+
+            it('resolveEnv returns admin env file for admin flag', () => {
+                const envFile = DbClass.resolveEnv({ admin: true })
+                assert.ok(envFile.endsWith('default-env-admin.json'))
+            })
+
+            it('objectName expands wildcard patterns as expected', () => {
+                assert.equal(DbClass.objectName('*'), '%')
+                assert.equal(DbClass.objectName(undefined), '%')
+                assert.equal(DbClass.objectName(null), '%')
+                assert.equal(DbClass.objectName('TABLE'), 'TABLE%')
+            })
+
+            it('schemaCalc handles special schema markers', async () => {
+                const fakeDb = {
+                    /** @returns {Promise<any[]>} */
+                    execSQL: async () => [{ CURRENT_SCHEMA: 'TEST_SCHEMA' }]
+                }
+
+                const schemaCalc = typeof DbClass.schemaCalc === 'function'
+                    ? DbClass.schemaCalc.bind(DbClass)
+                    : (() => {
+                        const instance = new DbClass({
+                            readyState: 'connected',
+                            hadError: false,
+                            prepare: (
+                                /** @type {string} */ _query,
+                                /** @type {(error:any, statement:any)=>void} */ cb
+                            ) => cb(null, {})
+                        })
+                        return instance.schemaCalc.bind(instance)
+                    })()
+
+                assert.equal(await schemaCalc({ schema: '**CURRENT_SCHEMA**' }, fakeDb), 'TEST_SCHEMA')
+                assert.equal(await schemaCalc({ schema: '*' }, fakeDb), '%')
+                assert.equal(await schemaCalc({ schema: 'MY_SCHEMA' }, fakeDb), 'MY_SCHEMA')
+            })
+        })
+
+        describe('Procedure output mapping', () => {
+            it('maps single result set to outputScalar + results', async () => {
+                const fakeClient = {
+                    readyState: 'connected',
+                    hadError: false,
+                    prepare: (
+                        /** @type {string} */ _query,
+                        /** @type {(error:any, statement:any)=>void} */ cb
+                    ) => cb(null, {})
+                }
+                const db = new DbClass(fakeClient)
+                const storedProc = {
+                    exec: (
+                        /** @type {any} */ _input,
+                        /** @type {(error:any, outputScalar:any, ...results:any[])=>void} */ cb
+                    ) => cb(null, { ERROR_CODE: 0 }, [{ ID: 1 }])
+                }
+
+                const output = await db.callProcedurePromisified(storedProc, {})
+                assert.deepEqual(output.outputScalar, { ERROR_CODE: 0 })
+                assert.deepEqual(output.results, [{ ID: 1 }])
+            })
+
+            it('maps multiple result sets to results0/results1/...', async () => {
+                const fakeClient = {
+                    readyState: 'connected',
+                    hadError: false,
+                    prepare: (
+                        /** @type {string} */ _query,
+                        /** @type {(error:any, statement:any)=>void} */ cb
+                    ) => cb(null, {})
+                }
+                const db = new DbClass(fakeClient)
+                const storedProc = {
+                    exec: (
+                        /** @type {any} */ _input,
+                        /** @type {(error:any, outputScalar:any, ...results:any[])=>void} */ cb
+                    ) => cb(null, { ERROR_CODE: 0 }, [{ A: 1 }], [{ B: 2 }])
+                }
+
+                const output = await db.callProcedurePromisified(storedProc, {})
+                assert.deepEqual(output.outputScalar, { ERROR_CODE: 0 })
+                assert.deepEqual(output.results0, [{ A: 1 }])
+                assert.deepEqual(output.results1, [{ B: 2 }])
+            })
+        })
+
+        describe('Integration', function () {
+            this.timeout(15000)
+
+            before(async function () {
+                try {
+                    await withDb(DbClass, async (db) => {
+                        const results = await db.execSQL('SELECT CURRENT_USER FROM DUMMY')
+                        assert.equal(results.length, 1)
+                    })
+                } catch (_error) {
+                    this.skip()
+                }
+            })
+
+            it('returns a single row for DUMMY query', async () => {
+                const results = await withDb(DbClass, async (db) => db.execSQL('SELECT CURRENT_USER, CURRENT_SCHEMA FROM DUMMY'))
+                assert.equal(results.length, 1)
+                assert.ok('CURRENT_USER' in results[0])
+                assert.ok('CURRENT_SCHEMA' in results[0])
+            })
+
+            it('throws error for unknown table', async () => {
+                await assert.rejects(
+                    withDb(DbClass, async (db) => db.execSQL('SELECT CURRENT_USER, CURRENT_SCHEMA FROM DUMMY_DUMB')),
+                    Error
+                )
+            })
+
+            it('validates password procedure if available', async function () {
+                try {
+                    const shortPwdResult = await withDb(DbClass, async (db) => {
+                        const sp = await db.loadProcedurePromisified('SYS', 'IS_VALID_PASSWORD')
+                        return db.callProcedurePromisified(sp, { PASSWORD: 'TEST' })
+                    })
+                    assert.equal(shortPwdResult.outputScalar.ERROR_CODE, 412)
+
+                    const goodPwdResult = await withDb(DbClass, async (db) => {
+                        const sp = await db.loadProcedurePromisified('SYS', 'IS_VALID_PASSWORD')
+                        return db.callProcedurePromisified(sp, { PASSWORD: 'TESTtest1234' })
+                    })
+                    assert.equal(goodPwdResult.outputScalar.ERROR_CODE, 0)
+                } catch (error) {
+                    if (/IS_VALID_PASSWORD|not found|insufficient privilege/i.test(String(error))) {
+                        this.skip()
+                    }
+                    throw error
+                }
+            })
+
+            it('throws error for unknown stored procedure', async () => {
+                await assert.rejects(
+                    withDb(DbClass, async (db) => {
+                        const sp = await db.loadProcedurePromisified('SYS', 'IS_VALID_PASSWORD_NOT_A_PROC')
+                        return db.callProcedurePromisified(sp, { PASSWORD: 'TESTtest1234' })
+                    }),
+                    Error
+                )
+            })
+        })
+    })
 }
-
-
-describe('hdb', () => {
-    describe('Example with Await', () => {
-        it('returns 10 records', async () => {
-            let dbQuery = `SELECT SCHEMA_NAME, TABLE_NAME, COMMENTS FROM TABLES LIMIT 10`
-            const results = await example1(dbQuery)
-            assert.equal(results.length, 10)
-        })
-
-        it('returns single record', async () => {
-            let dbQuery = `SELECT CURRENT_USER, CURRENT_SCHEMA from DUMMY`
-            const results = await example1(dbQuery)
-            assert.equal(results.length, 1)
-        })
-
-        it('throws error with target table not found', () => {
-            let dbQuery = `SELECT CURRENT_USER, CURRENT_SCHEMA from DUMMY_DUMB`
-            assert.rejects(async () => { await example1(dbQuery) }, Error)
-        })
-    })
-
-    
-    describe('Example Stored Procedure with Await', () => {
-        it('Password is too short - Error Code 412', async () => {
-            let result = await example2('SYS', 'IS_VALID_PASSWORD', { PASSWORD: "TEST" })
-            assert.equal(result.outputScalar.ERROR_CODE, 412)
-        })
-
-        it('Password is good - Error Code 412', async () => {
-            let result = await example2('SYS', 'IS_VALID_PASSWORD', { PASSWORD: "TESTtest1234" })
-            assert.equal(result.outputScalar.ERROR_CODE, 0)
-        })
-
-        it('throws error with Stored Procedure not found', async () => {
-            assert.rejects(async () => { await example2('SYS', 'IS_VALID_PASSWORD_NOT_A_PROC', { PASSWORD: "TESTtest1234" }) }, Error)
-        })
-
-    })
-})

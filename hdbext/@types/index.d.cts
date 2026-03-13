@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export = exports;
 declare class exports {
     /**
@@ -34,11 +33,10 @@ declare class exports {
     static objectName(name: string): string;
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type sap/hdbext
+      * @param {any} client - HANA DB Client instance of type sap/hdbext
      */
-    constructor(client: object);
+    constructor(client: any);
     client: any;
-    util: typeof import("util");
     /**
      * Prepare database statement
      * @param {string} query - database query

@@ -14,6 +14,8 @@ import { promisify } from 'util'
  * @module sap-hdbext-promisfied - promises version of sap/hdbext
  */
 
+const promiseLoadProcedure = promisify(hdbext.loadProcedure)
+
 export default class dbClass {
 
     /**
@@ -44,13 +46,13 @@ export default class dbClass {
             }
             debug(`Connection Options`, options)
             options.hana.pooling = true
-            hdbext.createConnection(options.hana, (error, client) => {
+            hdbext.createConnection(options.hana, ((/** @type {any} */ error, /** @type {any} */ client) => {
                 if (error) {
                     reject(error)
                 } else {
                     resolve(client)
                 }
-            })
+            }))
         })
     }
 
@@ -63,13 +65,13 @@ export default class dbClass {
         return new Promise((resolve, reject) => {
             options.pooling = true
             debug(`Connection Options`, options)
-            hdbext.createConnection(options, (error, client) => {
+            hdbext.createConnection(options, ((/** @type {any} */ error, /** @type {any} */ client) => {
                 if (error) {
                     reject(error)
                 } else {
                     resolve(client)
                 }
-            })
+            }))
         })
     }
 
@@ -126,7 +128,7 @@ export default class dbClass {
 
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type sap/hdbext 
+     * @param {any} client - HANA DB Client instance of type sap/hdbext 
      */
     constructor(client) {
         this.client = client
@@ -150,7 +152,7 @@ export default class dbClass {
      * @returns {Promise<any>} - resultset 
      */
     statementExecBatchPromisified(statement, parameters) {
-        statement.promiseExecBatch = promisify(statement.execBatch)
+        if (!statement.promiseExecBatch) statement.promiseExecBatch = promisify(statement.execBatch)
         return statement.promiseExecBatch(parameters)
     }
 
@@ -161,9 +163,9 @@ export default class dbClass {
      * @returns {Promise<any>} - resultset 
      */
     statementExecPromisified(statement, parameters) {
-        statement.promiseExec = promisify(statement.exec)
+        if (!statement.promiseExec) statement.promiseExec = promisify(statement.exec)
         return statement.promiseExec(parameters)
-    }    
+    }
 
     /**
      * Load stored procedure and return proxy function
@@ -173,7 +175,6 @@ export default class dbClass {
      * @returns {Promise<function>} - proxy function
      */
     loadProcedurePromisified(hdbext, schema, procedure) {
-        let promiseLoadProcedure = promisify(hdbext.loadProcedure)
         return promiseLoadProcedure(this.client, schema, procedure)
     }
 
@@ -182,22 +183,9 @@ export default class dbClass {
      * @param {string} sql - SQL Statement
      * @returns {Promise<any>} - result set object
      */
-    execSQL(sql) {
-        return new Promise((resolve, reject) => {
-            this.preparePromisified(sql)
-                .then(statement => {
-                    this.statementExecPromisified(statement, [])
-                        .then(results => {
-                            resolve(results)
-                        })
-                        .catch(err => {
-                            reject(err)
-                        });
-                })
-                .catch(err => {
-                    reject(err)
-                })
-        })
+    async execSQL(sql) {
+        const statement = await this.preparePromisified(sql)
+        return this.statementExecPromisified(statement, [])
     }
 
     /**
@@ -208,7 +196,7 @@ export default class dbClass {
      */
     callProcedurePromisified(storedProc, inputParams) {
         return new Promise((resolve, reject) => {
-            storedProc(inputParams, (error, outputScalar, ...results) => {
+            storedProc(inputParams, ((/** @type {any} */ error, /** @type {any} */ outputScalar, /** @type {any[]} */ ...results) => {
                 if (error) {
                     reject(error)
                 } else {
@@ -218,6 +206,7 @@ export default class dbClass {
                             results: results[0]
                         })
                     } else {
+                        /** @type {any} */
                         let output = {};
                         output.outputScalar = outputScalar;
                         for (let i = 0; i < results.length; i++) {
@@ -226,7 +215,7 @@ export default class dbClass {
                         resolve(output)
                     }
                 }
-            })
+            }))
         })
     }
 

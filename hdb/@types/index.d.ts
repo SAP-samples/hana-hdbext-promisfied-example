@@ -1,7 +1,4 @@
 export const debug: any;
-/**
- * @module sap-hdb-promisfied - promises version of hdb
- */
 export default class dbClass {
     /**
      * Create Database Connection From Environment
@@ -49,9 +46,9 @@ export default class dbClass {
     static objectName(name: string): string;
     /**
      * @constructor
-     * @param {object} client - HANA DB Client instance of type hdb
+     * @param {any} client - HANA DB Client instance of type hdb
      */
-    constructor(client: object);
+    constructor(client: any);
     client: any;
     /**
      * Destroy Client

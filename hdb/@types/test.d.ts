@@ -18,3 +18,4 @@ export function test2_2(): Promise<void>;
  * Test #3
  */
 export function test3(): Promise<void>;
+export function testUps(): Promise<void>;

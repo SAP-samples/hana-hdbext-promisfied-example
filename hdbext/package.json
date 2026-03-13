@@ -30,19 +30,22 @@
         "url": "https://github.com/SAP-samples/hana-hdbext-promisfied-example" 
     },
     "dependencies": {
-        "@sap/hdbext": "^8.1.10",
+        "@sap/hdbext": "^8.1.11",
         "@sap/xsenv": "^6.1.0",
         "debug": "^4.4.3",
-        "dotenv": "^17.2.3"
+        "dotenv": "^17.3.1"
     },
     "devDependencies": {
-        "@types/node": "^25.1.0"
+        "@types/debug": "^4.1.12",
+        "@types/mocha": "10.0.10",
+        "@types/node": "^25.1.0",
+        "@types/sap__xsenv": "^3.3.2"
     },
     "scripts": {
         "start": "node test",
         "types": "tsc  --declaration --allowJs --emitDeclarationOnly --outDir @types",
         "prodinstall": "npm install --only=prod",
-        "test": "mocha './tests/*.Test.js' --parallel --timeout 5000"
+        "test": "mocha \"./tests/*.Test.js\" --parallel --timeout 5000"
     },
     "engines": {
         "node": ">=18.18.0"
