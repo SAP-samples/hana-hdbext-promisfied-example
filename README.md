@@ -4,134 +4,182 @@
 
 ## Description
 
-With the standard @sap/hdbext you use nested events and callbacks like this:
+This repository contains two independent npm packages that wrap the SAP HANA client libraries in promise-based APIs, replacing callback-heavy code with cleaner async/await patterns:
+
+| Package | npm name | Wraps | Node.js |
+| --- | --- | --- | --- |
+| [`hdb/`](hdb/README.md) | `sap-hdb-promisfied` | `hdb` | `^20 \|\| ^22 \|\| ^24` |
+| [`hdbext/`](hdbext/README.md) | `sap-hdbext-promisfied` | `@sap/hdbext` | `>=18.18.0` |
+
+Both packages expose the same ES6 class API (`dbClass`) and ship dual ESM/CJS entry points (`index.js` / `index.cjs`).
+
+## Motivation
+
+With the standard `@sap/hdbext` you use nested callbacks like this:
 
 ```JavaScript
 let client = req.db;
 client.prepare(
- `SELECT SESSION_USER, CURRENT_SCHEMA 
-     FROM "DUMMY"`,
+ `SELECT SESSION_USER, CURRENT_SCHEMA FROM "DUMMY"`,
  (err, statement) => {
-  if (err) {
-   return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
-  }
+  if (err) return res.status(500).send(`ERROR: ${err.toString()}`);
   statement.exec([], (err, results) => {
-   if (err) {
-    return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`);
-   } else {
-    var result = JSON.stringify({
-     Objects: results
-    });
-    return res.type("application/json").status(200).send(result);
-   }
+   if (err) return res.status(500).send(`ERROR: ${err.toString()}`);
+   return res.status(200).json({ Objects: results });
   });
-  return null;
  });
 ```
 
-However this module wraps the major features of @sap/hdbext in a ES6 class and returns promises. Therefore you could re-write the above block using the easier to read and maintain promise based approach.  You just pass in an instance of the HANA Client @sap/hdbext module. In this example its a typical example that gets the HANA client as Express Middelware (req.db):
-
-```JavaScript
-const dbClass = require("sap-hdbext-promisfied")
-let db = new dbClass(req.db)
-db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
-                FROM "DUMMY"`)
- .then(statement => {
-  db.statementExecPromisified(statement, [])
-   .then(results => {
-    let result = JSON.stringify({
-     Objects: results
-    })
-    return res.type("application/json").status(200).send(result)
-   })
-   .catch(err => {
-    return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
-   })
- })
- .catch(err => {
-  return res.type("text/plain").status(500).send(`ERROR: ${err.toString()}`)
- })
-```
-
-Or better yet if you are running Node.js 8.x or higher you can use the new AWAIT feature and the code is even more streamlined:
+With `sap-hdbext-promisfied` the same code becomes:
 
 ```JavaScript
 try {
  const dbClass = require("sap-hdbext-promisfied")
  let db = new dbClass(req.db);
- const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
-                       FROM "DUMMY"`)
+ const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA FROM "DUMMY"`)
  const results = await db.statementExecPromisified(statement, [])
- let result = JSON.stringify({
-  Objects: results
- })
- return res.type("application/json").status(200).send(result)
+ return res.status(200).json({ Objects: results })
 } catch (e) {
- return res.type("text/plain").status(500).send(`ERROR: ${e.toString()}`)
+ return res.status(500).send(`ERROR: ${e.toString()}`)
 }
 ```
 
-There are even static helpers to load the HANA connection information from the environment (or local testing file like default-env.json or .env) and create the HANA client for you.  We can adjust the above example for such a scenario:
+## Installation
+
+```shell
+# hdbext variant
+npm install sap-hdbext-promisfied
+
+# hdb variant (no @sap/hana-client dependency)
+npm install sap-hdb-promisfied
+```
+
+Both packages are published to the default npm registry (`https://registry.npmjs.org`).
+
+> **Note:** If you previously configured a custom `@sap:registry`, remove it:
+>
+> ```shell
+> npm config delete @sap:registry
+> ```
+
+## Usage
+
+### Creating a connection
+
+Pass an existing HANA client instance directly:
 
 ```JavaScript
+import dbClass from 'sap-hdbext-promisfied'
+const db = new dbClass(req.db)           // req.db from Express middleware
+```
+
+Or let the class create and manage the connection from environment configuration:
+
+```JavaScript
+import dbClass from 'sap-hdbext-promisfied'
+const db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
+```
+
+For `sap-hdb-promisfied`, call `db.destroyClient()` when done to close the connection:
+
+```JavaScript
+import dbClass from 'sap-hdb-promisfied'
+const db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
 try {
-    const dbClass = require("sap-hdbext-promisfied")
-    let db = new dbClass(await dbClass.createConnectionFromEnv(dbClass.resolveEnv(null)))
-    const statement = await db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA 
-                                                     FROM "DUMMY"`)
-    const results = await db.statementExecPromisified(statement, [])
+    const results = await db.execSQL(`SELECT CURRENT_USER FROM DUMMY`)
     console.table(results)
-} catch (e) {
-    console.error(`ERROR: ${err.toString()}`)
+} finally {
+    db.destroyClient()
 }
 ```
 
-### Methods
-
-The following @sap/hdbext functions are exposed as promise-based methods
+### Querying
 
 ```JavaScript
-prepare = preparePromisified(query)
-statement.exec = statementExecPromisified(statement, parameters)
-loadProcedure = loadProcedurePromisified(hdbext, schema, procedure)
-storedProc = callProcedurePromisified(storedProc, inputParams)
+// Convenience: prepare + exec in one call
+const results = await db.execSQL(`SELECT SESSION_USER, CURRENT_SCHEMA FROM "DUMMY"`)
+
+// Or step by step for parameterised queries
+const statement = await db.preparePromisified(`SELECT * FROM "MY_TABLE" WHERE ID = ?`)
+const results = await db.statementExecPromisified(statement, [42])
+
+// Batch execution
+await db.statementExecBatchPromisified(statement, [[1], [2], [3]])
 ```
 
-We also have the simplified helper method to both prepare and execute a simple statement via one command:
+### Stored procedures
+
+**`hdbext` package** — uses `hdbext.loadProcedure`:
 
 ```JavaScript
-execSQL(sql)
+import * as hdbext from '@sap/hdbext'
+const sp = await db.loadProcedurePromisified(hdbext, 'SYS', 'IS_VALID_PASSWORD')
+const { outputScalar, results } = await db.callProcedurePromisified(sp, { PASSWORD: 'MyPass1234' })
 ```
 
-And finally there are static helpers
+**`hdb` package** — resolves procedure metadata via SQL, no `hdbext` dependency:
 
 ```JavaScript
-createConnectionFromEnv(envFile)
-createConnection(options)
-resolveEnv(options)
-schemaCalc(options, db)
-objectName(name)
+const sp = await db.loadProcedurePromisified('SYS', 'IS_VALID_PASSWORD')
+const { outputScalar, results } = await db.callProcedurePromisified(sp, [])
 ```
 
-## Requirements / Download and Installation
+**Procedure output shape:**
 
-* Install Node.js version 12.x or 14.x on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
+- Single result set → `{ outputScalar, results }`
+- Multiple result sets → `{ outputScalar, results0, results1, ... }`
 
-* @sap Node.js packages have moved from [https://npm.sap.com](https://npm.sap.com]) to the default registry <https://registry.npmjs.org>. As future versions of @sap modules are going to be published only there, please make sure to adjust your registry with:
+## API Reference
 
-```shell
-npm config delete @sap:registry
+### Instance methods
+
+| Method | Description |
+| --- | --- |
+| `preparePromisified(query)` | Prepare a SQL statement; returns a statement object |
+| `statementExecPromisified(statement, params)` | Execute a prepared statement |
+| `statementExecBatchPromisified(statement, params)` | Execute a prepared statement in batch |
+| `loadProcedurePromisified(...)` | Load a stored procedure (signature differs by package — see above) |
+| `callProcedurePromisified(storedProc, inputParams)` | Call a loaded stored procedure |
+| `execSQL(sql)` | Prepare + execute a statement and return the result set |
+| `destroyClient()` | *(hdb only)* Close the underlying connection |
+| `validateClient()` | *(hdb only)* Returns `true` if the connection is open and healthy |
+
+### Static helpers
+
+| Method | Description |
+| --- | --- |
+| `createConnectionFromEnv(envFile)` | Load connection config from env files and open a connection |
+| `createConnection(options)` | Open a connection with explicit options |
+| `resolveEnv(options)` | Resolve path to `default-env.json`; pass `{ admin: true }` for `default-env-admin.json` |
+| `schemaCalc(options, db)` | Resolve schema: `**CURRENT_SCHEMA**` → live value, `*` → `%` |
+| `objectName(name)` | Expand `*` / `null` / `undefined` → `%`; otherwise append `%` |
+| `fetchSPMetadata(db, procInfo)` | *(hdb only)* Fetch stored procedure parameter metadata from `SYS.PROCEDURE_PARAMETERS` |
+
+## Environment Configuration
+
+Connection credentials are never stored in code. Create a `default-env.json` file in the working directory (git-ignored):
+
+```json
+{
+  "VCAP_SERVICES": {
+    "hana": [{
+      "name": "my-hana-service",
+      "tags": ["hana"],
+      "credentials": {
+        "host": "...",
+        "port": 443,
+        "user": "...",
+        "password": "...",
+        "encrypt": true
+      }
+    }]
+  }
+}
 ```
 
-* Install the code sample as a reusable Node.js module
-
-```shell
-npm install -g sap-hdbext-promisfied
-```
-
-Or you can leverage this module by just listing as requirement in your own project's package.json.
-
-Finally you can clone the repository from [https://github.com/SAP-samples/hana-hdbext-promisified-example](https://github.com/SAP-samples/hana-hdbext-promisfied-example) to study the source content and view the consumption examples (test.js)
+- Use `default-env-admin.json` for admin-level connections (pass `{ admin: true }` to `resolveEnv`).
+- Set `TARGET_CONTAINER` environment variable to select a specific service binding by name rather than by tag.
+- The `hdb` package automatically enables TLS (`useTLS: true`) when `encrypt: true` is present in the credentials.
 
 ## Known Issues
 
