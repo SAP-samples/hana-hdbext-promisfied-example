@@ -182,6 +182,40 @@ Connection credentials are never stored in code. Create a `default-env.json` fil
 - Set `TARGET_CONTAINER` environment variable to select a specific service binding by name rather than by tag.
 - The `hdb` package automatically enables TLS (`useTLS: true`) when `encrypt: true` is present in the credentials.
 
+## CI / CD
+
+### Continuous Integration
+
+Every push to `main` and every pull request runs three parallel jobs via GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
+
+| Job | What it checks | Matrix |
+| --- | --- | --- |
+| **test-hdb** | `npm install` → `npm test` → `npm run types` | Node.js 20, 22 |
+| **test-hdbext** | `npm install` → `npm test` → `npm run types` | Node.js 20, 22 |
+| **test-hdbhelper** | `go build` → `go vet` → `go test -v` | Go 1.24 |
+
+All test suites include integration tests that require a live SAP HANA instance. When HANA is unreachable (as in CI), these tests **auto-skip** — the suite still passes. Unit tests always run.
+
+### Releasing the Go module
+
+Go modules are distributed directly from the Git repository — there is no registry to publish to. The Go module proxy (`proxy.golang.org`) caches modules automatically when users run `go get`.
+
+To release a new version of `hdbhelper`:
+
+1. Go to **Actions → Release Go Module → Run workflow**
+2. Enter a semver version (e.g. `0.1.0`)
+3. The workflow validates, builds, tests, then creates a `hdbhelper/v0.1.0` tag and pushes it
+
+The subdirectory prefix on the tag (`hdbhelper/v...`) is required by Go for modules that live in a subdirectory of a repository. After the tag is pushed, anyone can install the module:
+
+```shell
+go get github.com/SAP-samples/hana-hdbext-promisfied-example/hdbhelper@v0.1.0
+```
+
+### Releasing the Node.js packages
+
+The Node.js packages (`sap-hdb-promisfied`, `sap-hdbext-promisfied`) are published manually to the npm registry. Before publishing, run the release checklist (`.github/prompts/release-checklist.prompt.md`) which covers version metadata, ESM/CJS parity, type declarations, tests, and documentation.
+
 ## Known Issues
 
 None
