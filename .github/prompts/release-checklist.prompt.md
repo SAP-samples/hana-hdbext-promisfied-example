@@ -1,15 +1,16 @@
 ---
-description: "Run a pre-release checklist for this monorepo, covering hdb and hdbext tests, type declaration sync, docs parity, and packaging sanity checks."
+description: "Run a pre-release checklist for this monorepo, covering hdb, hdbext, and hdbhelper tests, type declaration sync, docs parity, and packaging sanity checks."
 name: "Release Checklist"
-argument-hint: "Optional release scope (hdb, hdbext, or both) and target version"
+argument-hint: "Optional release scope (hdb, hdbext, hdbhelper, or all) and target version"
 agent: "agent"
 ---
 Prepare and execute a pre-release verification checklist for this repository.
 
 ## Scope Rules
 
-- This repo has no root `package.json`; run package commands inside `hdb/` and/or `hdbext/`.
-- Default scope is both packages unless the user explicitly limits scope.
+- This repo has no root `package.json`; run Node.js package commands inside `hdb/` and/or `hdbext/`.
+- Go commands run inside `hdbhelper/`.
+- Default scope is all packages unless the user explicitly limits scope.
 
 ## Checklist
 
@@ -26,7 +27,8 @@ Prepare and execute a pre-release verification checklist for this repository.
    - Verify generated files under `@types/` reflect current runtime API.
 
 4. **Tests**
-   - Run `npm test` in each affected package.
+   - Run `npm test` in each affected Node.js package.
+   - Run `go test -v ./...` in `hdbhelper/` (also `go build ./...` and `go vet ./...`).
    - Summarize failures with file-level impact.
    - If HANA connectivity is unavailable, report the blocker and complete static validation.
 
@@ -36,6 +38,8 @@ Prepare and execute a pre-release verification checklist for this repository.
 
 6. **Release sanity checks**
    - Confirm ignored local env files are not staged (`.env`, `default-env*.json`).
+   - For Go releases: confirm `go.mod` module path and Go version directive are correct.
+   - For Go releases: the tag format must be `hdbhelper/vX.Y.Z` (subdirectory prefix required).
    - Provide a concise release readiness summary: ready / blocked / ready with caveats.
 
 ## Output Format

@@ -25,7 +25,7 @@ export default class dbClass {
      */
     static createConnectionFromEnv(envFile) {
         return new Promise((resolve, reject) => {
-            dotenv.config()
+            dotenv.config({ quiet: true })
             xsenv.loadEnv(envFile)
 
             /** @type any */

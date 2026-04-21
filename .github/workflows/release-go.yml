@@ -1,0 +1,54 @@
+name: Release Go Module
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Semantic version to release (e.g. 0.1.0)'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Validate version format
+        run: |
+          if ! echo "${{ inputs.version }}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Version must be in semver format (e.g. 0.1.0)"
+            exit 1
+          fi
+
+      - name: Build
+        run: go build ./...
+        working-directory: hdbhelper
+
+      - name: Vet
+        run: go vet ./...
+        working-directory: hdbhelper
+
+      - name: Test
+        run: go test -v ./...
+        working-directory: hdbhelper
+
+      - name: Create and push tag
+        run: |
+          TAG="hdbhelper/v${{ inputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+
+      - name: Trigger Go proxy
+        run: |
+          MODULE="github.com/${{ github.repository }}/hdbhelper"
+          VERSION="v${{ inputs.version }}"
+          echo "Requesting proxy cache for ${MODULE}@${VERSION}"
+          curl -sf "https://proxy.golang.org/${MODULE}/@v/${VERSION}.info" || echo "Proxy will index on first go get"

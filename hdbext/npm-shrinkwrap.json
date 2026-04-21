@@ -1,23 +1,23 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202601.0",
+    "version": "2.202604.0",
     "lockfileVersion": 3,
     "requires": true,
     "packages": {
         "": {
             "name": "sap-hdbext-promisfied",
-            "version": "2.202601.0",
+            "version": "2.202604.0",
             "license": "Apache-2.0",
             "dependencies": {
-                "@sap/hdbext": "^8.1.11",
-                "@sap/xsenv": "^6.1.0",
+                "@sap/hdbext": "^8.1.13",
+                "@sap/xsenv": "^6.2.0",
                 "debug": "^4.4.3",
-                "dotenv": "^17.3.1"
+                "dotenv": "^17.4.2"
             },
             "devDependencies": {
-                "@types/debug": "^4.1.12",
+                "@types/debug": "^4.1.13",
                 "@types/mocha": "10.0.10",
-                "@types/node": "^25.1.0",
+                "@types/node": "^25.6.0",
                 "@types/sap__xsenv": "^3.3.2"
             },
             "engines": {
@@ -25,9 +25,9 @@
             }
         },
         "node_modules/@sap/hdbext": {
-            "version": "8.1.11",
-            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-8.1.11.tgz",
-            "integrity": "sha512-Kn+x0+xyGSFLtBBD0Zqb5/vSCU8Fqnjgvzm7kLJoUJGHqh51HAar6vBrNgEca+MOshJGHGR5H1zCekZ+i3kSlA==",
+            "version": "8.1.13",
+            "resolved": "https://registry.npmjs.org/@sap/hdbext/-/hdbext-8.1.13.tgz",
+            "integrity": "sha512-QKipBZIe9xV6Zo0tjgXo0j80Q/zbHWMvsSpmzOmesqZ3zCDGppiJAsmZGRT+NRuhwvufJ8Xu57Aqzq9PoHkuFA==",
             "hasShrinkwrap": true,
             "license": "SEE LICENSE IN LICENSE file",
             "dependencies": {
@@ -36,7 +36,7 @@
                 "accept-language": "2.0.16",
                 "async": "3.2.6",
                 "debug": "4.4.3",
-                "lodash": "4.17.23",
+                "lodash": "4.18.1",
                 "verror": "1.10.1"
             },
             "engines": {
@@ -134,7 +134,7 @@
             }
         },
         "node_modules/@sap/hdbext/node_modules/lodash": {
-            "version": "4.17.23",
+            "version": "4.18.1",
             "license": "MIT"
         },
         "node_modules/@sap/hdbext/node_modules/ms": {
@@ -180,9 +180,9 @@
             "license": "ISC"
         },
         "node_modules/@sap/xsenv": {
-            "version": "6.1.0",
-            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-6.1.0.tgz",
-            "integrity": "sha512-vlW4Zad3uiDqHtnYdQ0TsEIH8VIO4HmPGDowfBL5dIcHPmeKDISEQ9ibeHL5FkceqvYcXJEQAVZ5/hsHDqlXZg==",
+            "version": "6.2.0",
+            "resolved": "https://registry.npmjs.org/@sap/xsenv/-/xsenv-6.2.0.tgz",
+            "integrity": "sha512-8jrsX1OAM3YUqGU+4deggqvkxrBrHAPYEllBX0YJfWNffgxSZKHG75bRd/RV6hxPwulPL0DeHfd2eYJMeY5gdw==",
             "license": "SEE LICENSE IN LICENSE file",
             "dependencies": {
                 "debug": "4.4.3",
@@ -194,9 +194,9 @@
             }
         },
         "node_modules/@types/debug": {
-            "version": "4.1.12",
-            "resolved": "https://registry.npmjs.org/@types/debug/-/debug-4.1.12.tgz",
-            "integrity": "sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==",
+            "version": "4.1.13",
+            "resolved": "https://registry.npmjs.org/@types/debug/-/debug-4.1.13.tgz",
+            "integrity": "sha512-KSVgmQmzMwPlmtljOomayoR89W4FynCAi3E8PPs7vmDVPe84hT+vGPKkJfThkmXs0x0jAaa9U8uW8bbfyS2fWw==",
             "dev": true,
             "license": "MIT",
             "dependencies": {
@@ -218,13 +218,13 @@
             "license": "MIT"
         },
         "node_modules/@types/node": {
-            "version": "25.1.0",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-25.1.0.tgz",
-            "integrity": "sha512-t7frlewr6+cbx+9Ohpl0NOTKXZNV9xHRmNOvql47BFJKcEG1CxtxlPEEe+gR9uhVWM4DwhnvTF110mIL4yP9RA==",
+            "version": "25.6.0",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-25.6.0.tgz",
+            "integrity": "sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==",
             "dev": true,
             "license": "MIT",
             "dependencies": {
-                "undici-types": "~7.16.0"
+                "undici-types": "~7.19.0"
             }
         },
         "node_modules/@types/sap__xsenv": {
@@ -276,9 +276,9 @@
             }
         },
         "node_modules/dotenv": {
-            "version": "17.3.1",
-            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-17.3.1.tgz",
-            "integrity": "sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==",
+            "version": "17.4.2",
+            "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-17.4.2.tgz",
+            "integrity": "sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==",
             "license": "BSD-2-Clause",
             "engines": {
                 "node": ">=12"
@@ -315,9 +315,9 @@
             }
         },
         "node_modules/undici-types": {
-            "version": "7.16.0",
-            "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-7.16.0.tgz",
-            "integrity": "sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==",
+            "version": "7.19.2",
+            "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-7.19.2.tgz",
+            "integrity": "sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==",
             "dev": true,
             "license": "MIT"
         },

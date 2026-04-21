@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-hdb:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+        working-directory: hdb
+      - name: Run tests
+        run: npm test
+        working-directory: hdb
+      - name: Generate type declarations
+        run: npm run types
+        working-directory: hdb
+
+  test-hdbext:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+        working-directory: hdbext
+      - name: Run tests
+        run: npm test
+        working-directory: hdbext
+      - name: Generate type declarations
+        run: npm run types
+        working-directory: hdbext
+
+  test-hdbhelper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - name: Build
+        run: go build ./...
+        working-directory: hdbhelper
+      - name: Vet
+        run: go vet ./...
+        working-directory: hdbhelper
+      - name: Test
+        run: go test -v ./...
+        working-directory: hdbhelper

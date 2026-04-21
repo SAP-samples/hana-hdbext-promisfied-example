@@ -1,17 +1,18 @@
-# Promisfied Wrapper around @sap/hdbext and [hdb](hdb/README.md)
+# SAP HANA Client Helpers — Node.js & Go
 
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/hana-hdbext-promisfied-example)](https://api.reuse.software/info/github.com/SAP-samples/hana-hdbext-promisfied-example)
 
 ## Description
 
-This repository contains two independent npm packages that wrap the SAP HANA client libraries in promise-based APIs, replacing callback-heavy code with cleaner async/await patterns:
+This repository contains high-level wrappers for SAP HANA client libraries, simplifying connection management, query execution, and stored procedure invocation:
 
-| Package | npm name | Wraps | Node.js |
+| Package | Language | Wraps | Runtime |
 | --- | --- | --- | --- |
-| [`hdb/`](hdb/README.md) | `sap-hdb-promisfied` | `hdb` | `^20 \|\| ^22 \|\| ^24` |
-| [`hdbext/`](hdbext/README.md) | `sap-hdbext-promisfied` | `@sap/hdbext` | `>=18.18.0` |
+| [`hdb/`](hdb/README.md) | Node.js | `hdb` | `^20 \|\| ^22 \|\| ^24` |
+| [`hdbext/`](hdbext/README.md) | Node.js | `@sap/hdbext` | `>=18.18.0` |
+| [`hdbhelper/`](hdbhelper/README.md) | Go | `SAP/go-hdb` | Go 1.22+ |
 
-Both packages expose the same ES6 class API (`dbClass`) and ship dual ESM/CJS entry points (`index.js` / `index.cjs`).
+The Node.js packages expose an ES6 class API (`dbClass`) with dual ESM/CJS entry points (`index.js` / `index.cjs`). The Go package provides an equivalent API surface using idiomatic Go patterns.
 
 ## Motivation
 
