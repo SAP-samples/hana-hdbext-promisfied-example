@@ -39,7 +39,9 @@
         "@types/debug": "^4.1.13",
         "@types/mocha": "10.0.10",
         "@types/node": "^25.6.0",
-        "@types/sap__xsenv": "^3.3.2"
+        "@types/sap__xsenv": "^3.3.2",
+        "mocha": "11.7.5",
+        "typescript": "~6.0.0"
     },
     "scripts": {
         "start": "node test",
