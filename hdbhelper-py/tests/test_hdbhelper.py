@@ -241,3 +241,34 @@ def test_procedure_call_maps_results():
     call_args = mock_cursor.callproc.call_args[0]
     assert call_args[0] == 'SYS."MY_PROC"'
     assert call_args[1] == ["test_input", None, None]
+
+
+import pytest
+from async_hdbhelper import AsyncDB
+
+
+@pytest.mark.asyncio
+async def test_async_db_wraps_sync():
+    """Test that AsyncDB delegates to sync DB."""
+    mock_db = MagicMock()
+    mock_db.exec_sql.return_value = [{"VAL": 1}]
+    mock_db.close.return_value = None
+
+    adb = AsyncDB(mock_db)
+    result = await adb.exec_sql("SELECT 1 FROM DUMMY")
+    assert result == [{"VAL": 1}]
+    mock_db.exec_sql.assert_called_once_with("SELECT 1 FROM DUMMY", None)
+
+    await adb.close()
+    mock_db.close.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_async_db_context_manager():
+    """Test async with support."""
+    mock_db = MagicMock()
+    mock_db.close.return_value = None
+
+    async with AsyncDB(mock_db) as adb:
+        assert adb is not None
+    mock_db.close.assert_called_once()
