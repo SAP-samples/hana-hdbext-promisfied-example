@@ -18,6 +18,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/remind-types-regen.js"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/esm-cjs-drift-check.js"
           }
         ]
       }

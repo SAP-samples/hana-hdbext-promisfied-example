@@ -1,10 +1,12 @@
 # Project Guidelines
 
 ## Architecture
-- This repository contains two independent Node.js packages:
+- This repository contains two independent Node.js packages and one Go package:
   - `hdb/`: promise wrapper around `hdb`
   - `hdbext/`: promise wrapper around `@sap/hdbext`
+  - `hdbhelper/`: Go helper wrapping `SAP/go-hdb`
 - There is no root `package.json`; run package commands inside `hdb/` or `hdbext/`.
+- Go commands run inside `hdbhelper/`.
 - Keep API parity inside each package across:
   - ESM entry: `index.js`
   - CJS entry: `index.cjs`

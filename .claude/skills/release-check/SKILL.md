@@ -1,6 +1,6 @@
 ---
 name: release-check
-description: Pre-release verification checklist for hdb and/or hdbext packages. Run before publishing to npm.
+description: Pre-release verification checklist for hdb, hdbext, and/or hdbhelper packages. Run before publishing to npm or tagging a Go release.
 disable-model-invocation: true
 ---
 
@@ -9,9 +9,9 @@ disable-model-invocation: true
 - Current state: !`git status --short`
 - Last tag: !`git describe --tags --abbrev=0 2>/dev/null || echo "no tags"`
 
-Run pre-release checklist for: $ARGUMENTS (default: both packages)
+Run pre-release checklist for: $ARGUMENTS (default: all packages)
 
-This repo has no root `package.json`. Run all package commands inside `hdb/` and/or `hdbext/`.
+This repo has no root `package.json`. Run Node.js package commands inside `hdb/` and/or `hdbext/`. Go commands run inside `hdbhelper/`.
 
 ## Checklist
 
@@ -41,6 +41,13 @@ This repo has no root `package.json`. Run all package commands inside `hdb/` and
 ### 6. Release sanity
 - Confirm `default-env*.json` and `.env` files are not staged
 - Check `npm-shrinkwrap.json` is present and up to date
+
+### 7. Go package (hdbhelper/)
+- Run `go build ./...` and `go vet ./...` in `hdbhelper/`
+- Run `go test -v ./...` (integration tests auto-skip without HANA)
+- Verify `go.mod` module path (`github.com/SAP-samples/hana-hdbext-promisfied-example/hdbhelper`) and Go version directive
+- Confirm tag format must be `hdbhelper/vX.Y.Z` (subdirectory prefix required for Go sub-modules)
+- Check `hdbhelper/README.md` reflects current API surface
 
 ## Output
 

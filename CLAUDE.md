@@ -8,7 +8,7 @@ This is a monorepo with **no root `package.json`**. It contains three independen
 
 - `hdb/` — Node.js promise wrapper around the `hdb` npm module (`sap-hdb-promisfied`, Node `^20 || ^22 || ^24`)
 - `hdbext/` — Node.js promise wrapper around `@sap/hdbext` (`sap-hdbext-promisfied`, Node `>=18.18.0`)
-- `hdbhelper/` — Go helper package wrapping `SAP/go-hdb` (Go 1.22+)
+- `hdbhelper/` — Go helper package wrapping `SAP/go-hdb` (Go 1.25+)
 
 Node.js `npm` commands must be run from inside `hdb/` or `hdbext/`. Go commands must be run from inside `hdbhelper/`.
 
@@ -124,6 +124,13 @@ Tests in `hdbhelper_test.go` follow the same auto-skip pattern: `mustConnect(t)`
   }
 }
 ```
+
+## CI/CD
+
+GitHub Actions workflows live in `.github/workflows/`:
+
+- **`ci.yml`** — Runs on push/PR to `main`. Tests `hdb/` and `hdbext/` on Node 20+22 matrix (`npm install --include=dev`, `npm test`, `npm run types`). Tests `hdbhelper/` with Go 1.24 (`go build`, `go vet`, `go test`). HANA integration tests auto-skip in CI.
+- **`release-go.yml`** — Manual dispatch. Takes a semver version input, validates, builds/vets/tests hdbhelper, then creates tag `hdbhelper/vX.Y.Z` and pings the Go module proxy. The subdirectory-prefixed tag format is required for Go sub-modules.
 
 ## Gotchas
 
