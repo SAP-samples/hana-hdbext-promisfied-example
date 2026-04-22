@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Structure
 
-This is a monorepo with **no root `package.json`**. It contains three independent packages:
+This is a monorepo with **no root `package.json`**. It contains four independent packages:
 
 - `hdb/` — Node.js promise wrapper around the `hdb` npm module (`sap-hdb-promisfied`, Node `^20 || ^22 || ^24`)
 - `hdbext/` — Node.js promise wrapper around `@sap/hdbext` (`sap-hdbext-promisfied`, Node `>=18.18.0`)
 - `hdbhelper/` — Go helper package wrapping `SAP/go-hdb` (Go 1.25+)
+- `hdbhelper-py/` — Python helper wrapping `hdbcli` (`sap-hdbhelper-py`, Python >=3.12)
 
-Node.js `npm` commands must be run from inside `hdb/` or `hdbext/`. Go commands must be run from inside `hdbhelper/`.
+Node.js `npm` commands must be run from inside `hdb/` or `hdbext/`. Go commands must be run from inside `hdbhelper/`. Python commands must be run from inside `hdbhelper-py/`.
 
 ## Commands
 
@@ -31,6 +32,13 @@ There is no lint script. There is no root-level `npm test` or `npm run types`.
 go test -v ./...      # Run all tests (integration tests auto-skip without HANA)
 go build ./...        # Build
 go vet ./...          # Static analysis
+```
+
+### Python (run from inside `hdbhelper-py/`)
+
+```sh
+pip install -e ".[dev]"  # Install with dev dependencies
+pytest -v                 # Run tests (integration tests auto-skip without HANA)
 ```
 
 ## Architecture
@@ -90,6 +98,15 @@ Single Go module wrapping `SAP/go-hdb` with:
 
 Tests in `hdbhelper_test.go` follow the same auto-skip pattern: `mustConnect(t)` calls `t.Skipf()` when HANA is unreachable. Unit tests for `ObjectName`, `ResolveEnvPath`, `resolveService`, `parsePort`, `parseBool` always run.
 
+### Python Package (`hdbhelper-py/`)
+
+Flat single-module layout wrapping `hdbcli` (SAP's official Python DB-API 2.0 driver) with:
+
+- **`hdbhelper.py`** — `ConnectionConfig`, `ProcParam`, `ProcedureResult` dataclasses, `DB` class (`exec_sql`, `ping`, `set_schema`, `current_schema`, `schema_calc`, `load_procedure`), `Procedure` class (`call` via `cursor.callproc()`), factory functions (`open`, `open_from_env`, `open_from_env_file`), pure helpers (`resolve_env_path`, `object_name`), VCAP_SERVICES resolution
+- **`async_hdbhelper.py`** — `AsyncDB` and `AsyncProcedure` wrapping sync via `asyncio.to_thread()` with `threading.Lock` for connection serialization, async factory functions (`async_open`, `async_open_from_env`, `async_open_from_env_file`)
+
+Tests in `tests/test_hdbhelper.py` use pytest + pytest-asyncio. Unit tests always run; integration tests auto-skip via fixtures that catch connection failures and call `pytest.skip()`.
+
 ## Code Style
 
 - Source files use `// @ts-check` with JSDoc type annotations — no TypeScript source files.
@@ -129,7 +146,7 @@ Tests in `hdbhelper_test.go` follow the same auto-skip pattern: `mustConnect(t)`
 
 GitHub Actions workflows live in `.github/workflows/`:
 
-- **`ci.yml`** — Runs on push/PR to `main`. Tests `hdb/` and `hdbext/` on Node 20+22 matrix (`npm install --include=dev`, `npm test`, `npm run types`). Tests `hdbhelper/` with Go 1.24 (`go build`, `go vet`, `go test`). HANA integration tests auto-skip in CI.
+- **`ci.yml`** — Runs on push/PR to `main`. Tests `hdb/` and `hdbext/` on Node 20+22 matrix (`npm install --include=dev`, `npm test`, `npm run types`). Tests `hdbhelper/` with Go 1.25 (`go build`, `go vet`, `go test`). Tests `hdbhelper-py/` on Python 3.12+3.13 matrix (`pip install -e ".[dev]"`, `pytest -v`). HANA integration tests auto-skip in CI.
 - **`release-go.yml`** — Manual dispatch. Takes a semver version input, validates, builds/vets/tests hdbhelper, then creates tag `hdbhelper/vX.Y.Z` and pings the Go module proxy. The subdirectory-prefixed tag format is required for Go sub-modules.
 
 ## Gotchas
