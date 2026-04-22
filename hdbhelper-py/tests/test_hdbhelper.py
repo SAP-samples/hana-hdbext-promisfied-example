@@ -168,3 +168,76 @@ def test_schema_calc_passthrough():
     mock_db = MagicMock(spec=DB)
     mock_db.schema_calc = DB.schema_calc.__get__(mock_db, DB)
     assert mock_db.schema_calc("MY_SCHEMA") == "MY_SCHEMA"
+
+
+from unittest.mock import PropertyMock
+from hdbhelper import Procedure, ProcParam, ProcedureResult
+
+
+def _make_proc_params():
+    """Create sample IN + OUT scalar + OUT table procedure params."""
+    return [
+        ProcParam(name="IN_VAL", data_type="NVARCHAR", parameter_type="IN",
+                  has_default="FALSE", is_inplace="FALSE",
+                  table_type_schema="", table_type_name="",
+                  is_table_type_synonym="FALSE", object_schema="", object_name=""),
+        ProcParam(name="OUT_CODE", data_type="INTEGER", parameter_type="OUT",
+                  has_default="FALSE", is_inplace="FALSE",
+                  table_type_schema="", table_type_name="",
+                  is_table_type_synonym="FALSE", object_schema="", object_name=""),
+        ProcParam(name="OUT_TABLE", data_type="TABLE_TYPE", parameter_type="OUT",
+                  has_default="FALSE", is_inplace="FALSE",
+                  table_type_schema="SYS", table_type_name="MY_TABLE_TYPE",
+                  is_table_type_synonym="FALSE", object_schema="", object_name=""),
+    ]
+
+
+def test_procedure_params_exposed():
+    params = _make_proc_params()
+    mock_db = MagicMock()
+    proc = Procedure(schema="SYS", name="MY_PROC", params=params, db=mock_db)
+    assert proc.params == params
+    assert len(proc.params) == 3
+
+
+def test_procedure_call_maps_results():
+    """Test that call() correctly maps scalar OUT + table OUT results."""
+    params = _make_proc_params()
+
+    mock_cursor = MagicMock()
+    # callproc returns args including OUT placeholders
+    mock_cursor.callproc.return_value = ("test_input", None, None)
+
+    # Result sets returned by nextset iteration:
+    # First result set: OUT_CODE scalar (single-row, single-col)
+    # Second result set: OUT_TABLE table result set
+    descriptions = [
+        [("OUT_CODE",)],                          # scalar OUT
+        [("ID",), ("NAME",)],                     # table OUT
+    ]
+    fetchall_results = [
+        [(42,)],                                   # scalar value
+        [(1, "Alice"), (2, "Bob")],                # table rows
+    ]
+    desc_iter = iter(descriptions)
+    fetch_iter = iter(fetchall_results)
+
+    type(mock_cursor).description = PropertyMock(side_effect=lambda: next(desc_iter))
+    mock_cursor.fetchall.side_effect = lambda: next(fetch_iter)
+    mock_cursor.nextset.side_effect = [True, False]
+
+    mock_db = MagicMock()
+    mock_db._conn.cursor.return_value = mock_cursor
+
+    proc = Procedure(schema="SYS", name="MY_PROC", params=params, db=mock_db)
+    result = proc.call("test_input")
+
+    assert result.output_scalar["OUT_CODE"] == 42
+    assert len(result.result_sets) == 1
+    assert result.result_sets[0] == [{"ID": 1, "NAME": "Alice"}, {"ID": 2, "NAME": "Bob"}]
+
+    # Verify callproc was called with 3 args (IN + OUT placeholder + OUT placeholder)
+    mock_cursor.callproc.assert_called_once()
+    call_args = mock_cursor.callproc.call_args[0]
+    assert call_args[0] == 'SYS."MY_PROC"'
+    assert call_args[1] == ["test_input", None, None]

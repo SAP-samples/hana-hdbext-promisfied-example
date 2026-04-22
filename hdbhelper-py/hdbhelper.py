@@ -115,6 +115,27 @@ def _parse_vcap(
     return cfg
 
 
+_SQL_PROCEDURE_METADATA = """\
+SELECT
+    PARAMS.PARAMETER_NAME,
+    PARAMS.DATA_TYPE_NAME,
+    PARAMS.PARAMETER_TYPE,
+    PARAMS.HAS_DEFAULT_VALUE,
+    PARAMS.IS_INPLACE_TYPE,
+    PARAMS.TABLE_TYPE_SCHEMA,
+    PARAMS.TABLE_TYPE_NAME,
+    CASE WHEN SYNONYMS.OBJECT_NAME IS NULL THEN 'FALSE'
+         ELSE 'TRUE' END AS IS_TABLE_TYPE_SYNONYM,
+    IFNULL(SYNONYMS.OBJECT_SCHEMA, '') AS OBJECT_SCHEMA,
+    IFNULL(SYNONYMS.OBJECT_NAME, '') AS OBJECT_NAME
+FROM SYS.PROCEDURE_PARAMETERS AS PARAMS
+LEFT JOIN SYS.SYNONYMS AS SYNONYMS
+    ON SYNONYMS.SCHEMA_NAME = PARAMS.TABLE_TYPE_SCHEMA
+    AND SYNONYMS.SYNONYM_NAME = PARAMS.TABLE_TYPE_NAME
+WHERE PARAMS.SCHEMA_NAME = ? AND PARAMS.PROCEDURE_NAME = ?
+ORDER BY PARAMS.POSITION"""
+
+
 class DB:
     def __init__(self, conn, schema: str = ""):
         self._conn = conn
@@ -169,6 +190,86 @@ class DB:
         if schema == "*":
             return "%"
         return schema
+
+    def load_procedure(self, schema: str, name: str) -> Procedure:
+        if not schema:
+            schema = self.current_schema()
+        rows = self.exec_sql(_SQL_PROCEDURE_METADATA, (schema, name))
+        params = [
+            ProcParam(
+                name=row["PARAMETER_NAME"],
+                data_type=row["DATA_TYPE_NAME"],
+                parameter_type=row["PARAMETER_TYPE"],
+                has_default=row["HAS_DEFAULT_VALUE"],
+                is_inplace=row["IS_INPLACE_TYPE"],
+                table_type_schema=row["TABLE_TYPE_SCHEMA"],
+                table_type_name=row["TABLE_TYPE_NAME"],
+                is_table_type_synonym=row["IS_TABLE_TYPE_SYNONYM"],
+                object_schema=row["OBJECT_SCHEMA"],
+                object_name=row["OBJECT_NAME"],
+            )
+            for row in rows
+        ]
+        return Procedure(schema=schema, name=name, params=params, db=self)
+
+
+class Procedure:
+    def __init__(self, schema: str, name: str, params: list[ProcParam], db: DB):
+        self.schema = schema
+        self.name = name
+        self.params = params
+        self._db = db
+
+    def call(self, *input_params: Any) -> ProcedureResult:
+        cursor = self._db._conn.cursor()
+        proc_name = f'{self.schema}."{self.name}"'
+
+        # Build args list for callproc — must include ALL params (IN, OUT, INOUT)
+        call_args = []
+        input_idx = 0
+        for p in self.params:
+            if p.parameter_type in ("IN", "INOUT"):
+                if input_idx < len(input_params):
+                    call_args.append(input_params[input_idx])
+                    input_idx += 1
+                else:
+                    call_args.append(None)
+            elif p.parameter_type == "OUT":
+                call_args.append(None)  # placeholder for OUT parameter
+
+        result_args = cursor.callproc(proc_name, call_args)
+
+        output_scalar: dict[str, Any] = {}
+        result_sets: list[list[dict[str, Any]]] = []
+
+        # Collect INOUT scalar values from returned args
+        arg_idx = 0
+        for p in self.params:
+            if p.parameter_type == "INOUT" and not p.table_type_name:
+                output_scalar[p.name] = result_args[arg_idx]
+            arg_idx += 1
+
+        # Collect OUT scalar and table result sets via nextset()
+        # Read description once per OUT param — each read advances the result set cursor
+        out_params = [p for p in self.params if p.parameter_type == "OUT"]
+        for p in out_params:
+            desc = cursor.description
+            if desc is None:
+                break
+            columns = [col[0] for col in desc]
+            if p.table_type_name:
+                rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+                result_sets.append(rows)
+            else:
+                rows = cursor.fetchall()
+                if rows:
+                    output_scalar[p.name] = rows[0][0]
+            cursor.nextset()
+
+        cursor.close()
+        return ProcedureResult(
+            output_scalar=output_scalar, result_sets=result_sets
+        )
 
 
 def open(cfg: ConnectionConfig) -> DB:
