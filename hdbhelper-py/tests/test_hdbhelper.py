@@ -201,30 +201,17 @@ def test_procedure_params_exposed():
 
 
 def test_procedure_call_maps_results():
-    """Test that call() correctly maps scalar OUT + table OUT results."""
+    """Test that call() correctly maps scalar OUT from result_args + table OUT from result sets."""
     params = _make_proc_params()
 
     mock_cursor = MagicMock()
-    # callproc returns args including OUT placeholders
-    mock_cursor.callproc.return_value = ("test_input", None, None)
+    # callproc returns modified args: IN value unchanged, scalar OUT value at position 1, table OUT placeholder
+    mock_cursor.callproc.return_value = ("test_input", 42, None)
 
-    # Result sets returned by nextset iteration:
-    # First result set: OUT_CODE scalar (single-row, single-col)
-    # Second result set: OUT_TABLE table result set
-    descriptions = [
-        [("OUT_CODE",)],                          # scalar OUT
-        [("ID",), ("NAME",)],                     # table OUT
-    ]
-    fetchall_results = [
-        [(42,)],                                   # scalar value
-        [(1, "Alice"), (2, "Bob")],                # table rows
-    ]
-    desc_iter = iter(descriptions)
-    fetch_iter = iter(fetchall_results)
-
-    type(mock_cursor).description = PropertyMock(side_effect=lambda: next(desc_iter))
-    mock_cursor.fetchall.side_effect = lambda: next(fetch_iter)
-    mock_cursor.nextset.side_effect = [True, False]
+    # Only table-type OUT params produce cursor result sets
+    type(mock_cursor).description = PropertyMock(return_value=[("ID",), ("NAME",)])
+    mock_cursor.fetchall.return_value = [(1, "Alice"), (2, "Bob")]
+    mock_cursor.nextset.return_value = False
 
     mock_db = MagicMock()
     mock_db._conn.cursor.return_value = mock_cursor
@@ -232,11 +219,12 @@ def test_procedure_call_maps_results():
     proc = Procedure(schema="SYS", name="MY_PROC", params=params, db=mock_db)
     result = proc.call("test_input")
 
+    # Scalar OUT value comes from result_args[1]
     assert result.output_scalar["OUT_CODE"] == 42
+    # Table OUT comes from cursor result set
     assert len(result.result_sets) == 1
     assert result.result_sets[0] == [{"ID": 1, "NAME": "Alice"}, {"ID": 2, "NAME": "Bob"}]
 
-    # Verify callproc was called with 3 args (IN + OUT placeholder + OUT placeholder)
     mock_cursor.callproc.assert_called_once()
     call_args = mock_cursor.callproc.call_args[0]
     assert call_args[0] == 'SYS."MY_PROC"'

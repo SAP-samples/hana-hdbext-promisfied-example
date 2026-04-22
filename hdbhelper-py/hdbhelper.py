@@ -153,31 +153,35 @@ class DB:
     def ping(self) -> bool:
         try:
             cursor = self._conn.cursor()
-            cursor.execute("SELECT 1 FROM DUMMY")
-            cursor.close()
+            try:
+                cursor.execute("SELECT 1 FROM DUMMY")
+            finally:
+                cursor.close()
             return True
         except Exception:
             return False
 
     def exec_sql(self, query: str, params: Any = None) -> list[dict[str, Any]]:
         cursor = self._conn.cursor()
-        if params is not None:
-            cursor.execute(query, params)
-        else:
-            cursor.execute(query)
-        if cursor.description is None:
+        try:
+            if params is not None:
+                cursor.execute(query, params)
+            else:
+                cursor.execute(query)
+            if cursor.description is None:
+                return []
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+        finally:
             cursor.close()
-            return []
-        columns = [col[0] for col in cursor.description]
-        rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        cursor.close()
-        return rows
 
     def set_schema(self, schema: str) -> None:
         quoted = '"' + schema.replace('"', '""') + '"'
         cursor = self._conn.cursor()
-        cursor.execute("SET SCHEMA " + quoted)
-        cursor.close()
+        try:
+            cursor.execute("SET SCHEMA " + quoted)
+        finally:
+            cursor.close()
         self._schema = schema
 
     def current_schema(self) -> str:
@@ -222,54 +226,53 @@ class Procedure:
 
     def call(self, *input_params: Any) -> ProcedureResult:
         cursor = self._db._conn.cursor()
-        proc_name = f'{self.schema}."{self.name}"'
+        try:
+            proc_name = f'{self.schema}."{self.name}"'
 
-        # Build args list for callproc — must include ALL params (IN, OUT, INOUT)
-        call_args = []
-        input_idx = 0
-        for p in self.params:
-            if p.parameter_type in ("IN", "INOUT"):
-                if input_idx < len(input_params):
-                    call_args.append(input_params[input_idx])
-                    input_idx += 1
-                else:
+            call_args = []
+            input_idx = 0
+            for p in self.params:
+                if p.parameter_type in ("IN", "INOUT"):
+                    if input_idx < len(input_params):
+                        call_args.append(input_params[input_idx])
+                        input_idx += 1
+                    else:
+                        call_args.append(None)
+                elif p.parameter_type == "OUT":
                     call_args.append(None)
-            elif p.parameter_type == "OUT":
-                call_args.append(None)  # placeholder for OUT parameter
 
-        result_args = cursor.callproc(proc_name, call_args)
+            result_args = cursor.callproc(proc_name, call_args)
 
-        output_scalar: dict[str, Any] = {}
-        result_sets: list[list[dict[str, Any]]] = []
+            output_scalar: dict[str, Any] = {}
+            result_sets: list[list[dict[str, Any]]] = []
 
-        # Collect INOUT scalar values from returned args
-        arg_idx = 0
-        for p in self.params:
-            if p.parameter_type == "INOUT" and not p.table_type_name:
-                output_scalar[p.name] = result_args[arg_idx]
-            arg_idx += 1
+            # Scalar OUT and INOUT values come from the returned args tuple
+            arg_idx = 0
+            for p in self.params:
+                if p.parameter_type in ("OUT", "INOUT") and not p.table_type_name:
+                    output_scalar[p.name] = result_args[arg_idx]
+                arg_idx += 1
 
-        # Collect OUT scalar and table result sets via nextset()
-        # Read description once per OUT param — each read advances the result set cursor
-        out_params = [p for p in self.params if p.parameter_type == "OUT"]
-        for p in out_params:
-            desc = cursor.description
-            if desc is None:
-                break
-            columns = [col[0] for col in desc]
-            if p.table_type_name:
-                rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
-                result_sets.append(rows)
-            else:
-                rows = cursor.fetchall()
-                if rows:
-                    output_scalar[p.name] = rows[0][0]
-            cursor.nextset()
+            # Table-type OUT parameters produce result sets via nextset()
+            for p in self.params:
+                if p.parameter_type == "OUT" and p.table_type_name:
+                    desc = cursor.description
+                    if desc is None:
+                        if not cursor.nextset():
+                            break
+                        desc = cursor.description
+                        if desc is None:
+                            break
+                    columns = [col[0] for col in desc]
+                    rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+                    result_sets.append(rows)
+                    cursor.nextset()
 
-        cursor.close()
-        return ProcedureResult(
-            output_scalar=output_scalar, result_sets=result_sets
-        )
+            return ProcedureResult(
+                output_scalar=output_scalar, result_sets=result_sets
+            )
+        finally:
+            cursor.close()
 
 
 def open(cfg: ConnectionConfig) -> DB:
