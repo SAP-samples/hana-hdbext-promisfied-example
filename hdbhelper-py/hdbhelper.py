@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import builtins as _builtins
 import json
 import logging
 import os
@@ -112,3 +113,107 @@ def _parse_vcap(
     if schema_override:
         cfg.schema = schema_override
     return cfg
+
+
+class DB:
+    def __init__(self, conn, schema: str = ""):
+        self._conn = conn
+        self._schema = schema
+
+    def close(self) -> None:
+        self._conn.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
+    def ping(self) -> bool:
+        try:
+            cursor = self._conn.cursor()
+            cursor.execute("SELECT 1 FROM DUMMY")
+            cursor.close()
+            return True
+        except Exception:
+            return False
+
+    def exec_sql(self, query: str, params: Any = None) -> list[dict[str, Any]]:
+        cursor = self._conn.cursor()
+        if params is not None:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+        if cursor.description is None:
+            cursor.close()
+            return []
+        columns = [col[0] for col in cursor.description]
+        rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        cursor.close()
+        return rows
+
+    def set_schema(self, schema: str) -> None:
+        quoted = '"' + schema.replace('"', '""') + '"'
+        cursor = self._conn.cursor()
+        cursor.execute("SET SCHEMA " + quoted)
+        cursor.close()
+        self._schema = schema
+
+    def current_schema(self) -> str:
+        rows = self.exec_sql("SELECT CURRENT_SCHEMA FROM DUMMY")
+        return rows[0]["CURRENT_SCHEMA"]
+
+    def schema_calc(self, schema: str) -> str:
+        if schema == "**CURRENT_SCHEMA**":
+            return self.current_schema()
+        if schema == "*":
+            return "%"
+        return schema
+
+
+def open(cfg: ConnectionConfig) -> DB:
+    from hdbcli import dbapi
+    logger.debug("connecting to %s:%d", cfg.host, cfg.port)
+    conn = dbapi.connect(
+        address=cfg.host,
+        port=cfg.port,
+        user=cfg.user,
+        password=cfg.password,
+        encrypt=cfg.encrypt,
+        sslValidateCertificate=cfg.encrypt,
+    )
+    db = DB(conn, schema=cfg.schema)
+    if cfg.schema:
+        db.set_schema(cfg.schema)
+    return db
+
+
+def open_from_env(
+    target_container: str | None = None, schema: str | None = None
+) -> DB:
+    tc = target_container or os.environ.get("TARGET_CONTAINER", "")
+
+    vcap_raw = os.environ.get("VCAP_SERVICES")
+    if vcap_raw:
+        services = json.loads(vcap_raw)
+        cfg = _parse_vcap(services, tc, schema or "")
+        return open(cfg)
+
+    env_path = resolve_env_path()
+    return open_from_env_file(env_path, target_container=target_container, schema=schema)
+
+
+def open_from_env_file(
+    path: str, target_container: str | None = None, schema: str | None = None
+) -> DB:
+    tc = target_container or os.environ.get("TARGET_CONTAINER", "")
+
+    with _builtins.open(path) as f:
+        data = json.load(f)
+
+    vcap = data.get("VCAP_SERVICES")
+    if vcap is None:
+        raise ValueError(f"hdbhelper: no VCAP_SERVICES key in {path}")
+
+    cfg = _parse_vcap(vcap, tc, schema or "")
+    return open(cfg)

@@ -116,3 +116,55 @@ def test_parse_vcap_port_default():
     }]}
     cfg = _parse_vcap(vcap, target_container="", schema_override="")
     assert cfg.port == 443
+
+
+from unittest.mock import MagicMock
+from hdbhelper import open_from_env_file, DB
+
+
+def test_open_from_env_file_parses_vcap(tmp_path):
+    env_file = tmp_path / "default-env.json"
+    env_file.write_text(json.dumps({
+        "VCAP_SERVICES": {
+            "hana": [{
+                "name": "test-hana",
+                "tags": ["hana"],
+                "credentials": {
+                    "host": "localhost",
+                    "port": 30015,
+                    "user": "SYSTEM",
+                    "password": "secret",
+                    "schema": "TEST_SCHEMA",
+                    "encrypt": False
+                }
+            }]
+        }
+    }))
+    with pytest.raises(Exception):
+        open_from_env_file(str(env_file))
+
+
+def test_open_from_env_file_missing():
+    with pytest.raises(FileNotFoundError):
+        open_from_env_file("/nonexistent/default-env.json")
+
+
+def test_open_from_env_file_no_vcap(tmp_path):
+    env_file = tmp_path / "default-env.json"
+    env_file.write_text('{"other": "data"}')
+    with pytest.raises(ValueError, match="no VCAP_SERVICES"):
+        open_from_env_file(str(env_file))
+
+
+def test_schema_calc_wildcard():
+    """schema_calc('*') is a pure operation — no DB needed."""
+    mock_db = MagicMock(spec=DB)
+    mock_db.schema_calc = DB.schema_calc.__get__(mock_db, DB)
+    assert mock_db.schema_calc("*") == "%"
+
+
+def test_schema_calc_passthrough():
+    """schema_calc with a plain string is a pure operation — no DB needed."""
+    mock_db = MagicMock(spec=DB)
+    mock_db.schema_calc = DB.schema_calc.__get__(mock_db, DB)
+    assert mock_db.schema_calc("MY_SCHEMA") == "MY_SCHEMA"
