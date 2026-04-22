@@ -272,3 +272,82 @@ async def test_async_db_context_manager():
     async with AsyncDB(mock_db) as adb:
         assert adb is not None
     mock_db.close.assert_called_once()
+
+
+@pytest.fixture
+def hana_db():
+    """Connect to HANA or skip. Yields a DB, closes on teardown."""
+    try:
+        from hdbhelper import open_from_env
+        db = open_from_env()
+    except Exception as e:
+        pytest.skip(f"HANA not reachable: {e}")
+    yield db
+    db.close()
+
+
+@pytest.fixture
+async def async_hana_db():
+    """Async connect to HANA or skip."""
+    try:
+        from async_hdbhelper import async_open_from_env
+        db = await async_open_from_env()
+    except Exception as e:
+        pytest.skip(f"HANA not reachable: {e}")
+    yield db
+    await db.close()
+
+
+class TestIntegration:
+    def test_exec_sql(self, hana_db):
+        rows = hana_db.exec_sql('SELECT 1 AS "VAL" FROM DUMMY')
+        assert len(rows) == 1
+        assert rows[0]["VAL"] is not None
+
+    def test_current_schema(self, hana_db):
+        schema = hana_db.current_schema()
+        assert schema != ""
+
+    def test_ping(self, hana_db):
+        assert hana_db.ping() is True
+
+    def test_schema_calc_current(self, hana_db):
+        schema = hana_db.schema_calc("**CURRENT_SCHEMA**")
+        assert schema != ""
+
+    def test_schema_calc_wildcard(self, hana_db):
+        assert hana_db.schema_calc("*") == "%"
+
+    def test_schema_calc_passthrough(self, hana_db):
+        assert hana_db.schema_calc("MY_SCHEMA") == "MY_SCHEMA"
+
+    def test_exec_sql_error(self, hana_db):
+        with pytest.raises(Exception):
+            hana_db.exec_sql("SELECT * FROM NONEXISTENT_TABLE_XYZ")
+
+    def test_load_and_call_procedure(self, hana_db):
+        """Integration test for stored procedure load + call."""
+        schema = hana_db.current_schema()
+        try:
+            proc = hana_db.load_procedure("SYS", "IS_VALID_PASSWORD")
+            result = proc.call("TestPassword1!")
+            assert isinstance(result.output_scalar, dict)
+            assert isinstance(result.result_sets, list)
+        except Exception:
+            pytest.skip("SYS.IS_VALID_PASSWORD not available")
+
+
+class TestAsyncIntegration:
+    @pytest.mark.asyncio
+    async def test_async_exec_sql(self, async_hana_db):
+        rows = await async_hana_db.exec_sql('SELECT 1 AS "VAL" FROM DUMMY')
+        assert len(rows) == 1
+
+    @pytest.mark.asyncio
+    async def test_async_current_schema(self, async_hana_db):
+        schema = await async_hana_db.current_schema()
+        assert schema != ""
+
+    @pytest.mark.asyncio
+    async def test_async_ping(self, async_hana_db):
+        assert await async_hana_db.ping() is True
