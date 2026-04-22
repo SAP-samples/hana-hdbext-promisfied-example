@@ -1,18 +1,19 @@
-# SAP HANA Client Helpers — Node.js & Go
+# SAP HANA Client Helpers — Node.js, Go & Python
 
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/hana-hdbext-promisfied-example)](https://api.reuse.software/info/github.com/SAP-samples/hana-hdbext-promisfied-example)
 
 ## Description
 
-This repository contains high-level wrappers for SAP HANA client libraries, simplifying connection management, query execution, and stored procedure invocation:
+This repository contains high-level wrappers for SAP HANA client libraries, simplifying connection management, query execution, and stored procedure invocation in Node.js, Go, and Python:
 
 | Package | Language | Wraps | Runtime |
 | --- | --- | --- | --- |
 | [`hdb/`](hdb/README.md) | Node.js | `hdb` | `^20 \|\| ^22 \|\| ^24` |
 | [`hdbext/`](hdbext/README.md) | Node.js | `@sap/hdbext` | `>=18.18.0` |
 | [`hdbhelper/`](hdbhelper/README.md) | Go | `SAP/go-hdb` | Go 1.22+ |
+| [`hdbhelper-py/`](hdbhelper-py/README.md) | Python | `hdbcli` | Python 3.12+ |
 
-The Node.js packages expose an ES6 class API (`dbClass`) with dual ESM/CJS entry points (`index.js` / `index.cjs`). The Go package provides an equivalent API surface using idiomatic Go patterns.
+The Node.js packages expose an ES6 class API (`dbClass`) with dual ESM/CJS entry points (`index.js` / `index.cjs`). The Go package provides an equivalent API surface using idiomatic Go patterns. The Python package wraps `hdbcli` with the same connection-from-environment and stored procedure patterns.
 
 ## Motivation
 
@@ -186,13 +187,14 @@ Connection credentials are never stored in code. Create a `default-env.json` fil
 
 ### Continuous Integration
 
-Every push to `main` and every pull request runs three parallel jobs via GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
+Every push to `main` and every pull request runs four parallel jobs via GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 
 | Job | What it checks | Matrix |
 | --- | --- | --- |
 | **test-hdb** | `npm install` → `npm test` → `npm run types` | Node.js 20, 22 |
 | **test-hdbext** | `npm install` → `npm test` → `npm run types` | Node.js 20, 22 |
-| **test-hdbhelper** | `go build` → `go vet` → `go test -v` | Go 1.24 |
+| **test-hdbhelper** | `go build` → `go vet` → `go test -v` | Go 1.25 |
+| **test-hdbhelper-py** | `pip install` → `pytest -v` | Python 3.12, 3.13 |
 
 All test suites include integration tests that require a live SAP HANA instance. When HANA is unreachable (as in CI), these tests **auto-skip** — the suite still passes. Unit tests always run.
 

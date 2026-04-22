@@ -64,3 +64,20 @@ jobs:
       - name: Test
         run: go test -v ./...
         working-directory: hdbhelper
+
+  test-hdbhelper-py:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+        working-directory: hdbhelper-py
+      - name: Test
+        run: pytest -v
+        working-directory: hdbhelper-py
