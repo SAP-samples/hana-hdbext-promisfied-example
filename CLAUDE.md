@@ -148,6 +148,7 @@ GitHub Actions workflows live in `.github/workflows/`:
 
 - **`ci.yml`** — Runs on push/PR to `main`. Tests `hdb/` and `hdbext/` on Node 20+22 matrix (`npm install --include=dev`, `npm test`, `npm run types`). Tests `hdbhelper/` with Go 1.25 (`go build`, `go vet`, `go test`). Tests `hdbhelper-py/` on Python 3.12+3.13 matrix (`pip install -e ".[dev]"`, `pytest -v`). HANA integration tests auto-skip in CI.
 - **`release-go.yml`** — Manual dispatch. Takes a semver version input, validates, builds/vets/tests hdbhelper, then creates tag `hdbhelper/vX.Y.Z` and pings the Go module proxy. The subdirectory-prefixed tag format is required for Go sub-modules.
+- **`release-python.yml`** — Manual dispatch. Takes a semver version input, validates, tests `hdbhelper-py/`, bumps version in `pyproject.toml`, builds sdist+wheel, commits version bump, creates tag `hdbhelper-py/vX.Y.Z`, publishes to PyPI via trusted publisher (OIDC).
 
 ## Gotchas
 
