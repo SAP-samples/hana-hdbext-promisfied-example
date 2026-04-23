@@ -10,6 +10,7 @@ This is a monorepo with **no root `package.json`**. It contains four independent
 - `hdbext/` — Node.js promise wrapper around `@sap/hdbext` (`sap-hdbext-promisfied`, Node `>=18.18.0`)
 - `hdbhelper/` — Go helper package wrapping `SAP/go-hdb` (Go 1.25+)
 - `hdbhelper-py/` — Python helper wrapping `hdbcli` (`sap-hdbhelper-py`, Python >=3.12)
+- `scripts/` — Automation scripts (dependency updates)
 
 Node.js `npm` commands must be run from inside `hdb/` or `hdbext/`. Go commands must be run from inside `hdbhelper/`. Python commands must be run from inside `hdbhelper-py/`.
 
@@ -40,6 +41,20 @@ go vet ./...          # Static analysis
 pip install -e ".[dev]"  # Install with dev dependencies
 pytest -v                 # Run tests (integration tests auto-skip without HANA)
 ```
+
+### Dependency Updates
+
+Run `/update-deps` in Claude Code to update all dependencies across all packages. This invokes `scripts/update-deps.sh` which:
+
+1. Snapshots current versions
+2. Runs `npm update` / `go get -u` / `pip install --upgrade`
+3. Regenerates TypeScript declarations
+4. Runs tests
+5. Outputs a JSON report
+
+The skill then updates `CHANGELOG.md` and commits with your approval.
+
+Alternatively, run the script directly: `bash scripts/update-deps.sh`
 
 ## Architecture
 

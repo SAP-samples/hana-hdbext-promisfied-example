@@ -26,6 +26,10 @@
   - `npm start` runs `node test` (manual example script).
 - If you change runtime API in `index.js` or `index.cjs`, update type declarations in `@types/` and run `npm run types`.
 
+## Dependency Updates
+
+Run `bash scripts/update-deps.sh` from the repo root to update all dependencies across all packages. The script handles npm, Go, and pip ecosystems, regenerates TypeScript declarations, runs tests, and outputs a JSON report. See `CLAUDE.md` for full details.
+
 ## Environment and Pitfalls
 - Tests are integration-style and expect a reachable HANA setup.
 - Connection config is loaded from environment/default env files via `dotenv` + `@sap/xsenv` (`default-env.json` / `default-env-admin.json`).
