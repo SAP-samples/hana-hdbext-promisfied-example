@@ -266,22 +266,125 @@ update_python_package() {
 }
 
 # ---------------------------------------------------------------------------
+# Phase 3: Types Regeneration
+# ---------------------------------------------------------------------------
+
+regen_types() {
+  for pkg_dir in hdb hdbext; do
+    if has_tool npm && [ -d "$REPO_ROOT/$pkg_dir" ]; then
+      echo "INFO: Regenerating types for $pkg_dir" >&2
+      (cd "$REPO_ROOT/$pkg_dir" && npm run types 2>&1) >&2 || echo "WARN: types regen failed for $pkg_dir" >&2
+    fi
+  done
+}
+
+# ---------------------------------------------------------------------------
+# Phase 4: Test
+# ---------------------------------------------------------------------------
+
+run_tests() {
+  local name="$1" pkg_dir="$REPO_ROOT/$2" ecosystem="$3" test_cmd="$4"
+
+  echo "INFO: Testing $name ($2)" >&2
+  local test_output exit_code=0
+  test_output=$(cd "$pkg_dir" && eval "$test_cmd" 2>&1) || exit_code=$?
+
+  local passed=true
+  if [ $exit_code -ne 0 ]; then passed=false; fi
+
+  # Extract summary line
+  local summary=""
+  case "$ecosystem" in
+    node)
+      summary=$(echo "$test_output" | grep -E '^\s+[0-9]+ passing' | head -1) || true
+      local skipped
+      skipped=$(echo "$test_output" | grep -E '^\s+[0-9]+ pending' | head -1) || true
+      [ -n "$skipped" ] && summary="$summary, $skipped"
+      ;;
+    go)
+      summary=$(echo "$test_output" | grep -E '^(ok|FAIL|---)\s' | tail -3 | tr '\n' '; ') || true
+      ;;
+    python)
+      summary=$(echo "$test_output" | grep -E '^=.*(passed|failed|error)' | tail -1) || true
+      ;;
+  esac
+  [ -z "$summary" ] && summary="exit code $exit_code"
+
+  echo "$name|$passed|$summary"
+}
+
+# Store test results in temp files (Bash 3.x compat — no associative arrays)
+TEST_RESULTS_DIR=$(mktemp -d)
+
+save_test_result() {
+  local name="$1" result="$2"
+  echo "$result" > "$TEST_RESULTS_DIR/$name"
+}
+
+get_test_result() {
+  local name="$1"
+  if [ -f "$TEST_RESULTS_DIR/$name" ]; then cat "$TEST_RESULTS_DIR/$name"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
 # --- Main ---
 > "$REPORT_FILE.pending"
 
+# Phase 1+2: Update all ecosystems
 update_node_package "hdb" "hdb"
 update_node_package "hdbext" "hdbext"
 update_go_package
 update_python_package
 
-# Merge pending lines into the JSON report
+# Phase 3: Regenerate types
+regen_types
+
+# Phase 4: Run tests
+if has_tool npm; then
+  for pkg in hdb hdbext; do
+    result=$(run_tests "$pkg" "$pkg" "node" "npm test")
+    save_test_result "$pkg" "$result"
+  done
+fi
+
+if has_tool go && [ -d "$REPO_ROOT/hdbhelper" ]; then
+  result=$(run_tests "hdbhelper" "hdbhelper" "go" "go test -v ./...")
+  save_test_result "hdbhelper" "$result"
+fi
+
+if has_tool pip && [ -n "${VIRTUAL_ENV:-}" ] && [ -d "$REPO_ROOT/hdbhelper-py" ]; then
+  result=$(run_tests "hdbhelper-py" "hdbhelper-py" "python" "pytest -v")
+  save_test_result "hdbhelper-py" "$result"
+fi
+
+# Phase 5: Assemble final JSON report
+# Merge pending lines (non-skipped packages) with test results
 if $HAS_JQ && [ -f "$REPORT_FILE.pending" ]; then
   while IFS='|' read -r pkg_name pkg_path ecosystem deps_json; do
     [ -z "$pkg_name" ] && continue
-    append_package "{\"name\":\"$pkg_name\",\"path\":\"$pkg_path\",\"ecosystem\":\"$ecosystem\",\"skipped\":false,\"dependencies\":${deps_json:-[]}}"
+
+    # Look up test results for this package
+    local_test_line=$(get_test_result "$pkg_name")
+    local_test_passed="null"
+    local_test_summary="not run"
+    if [ -n "$local_test_line" ]; then
+      IFS='|' read -r _name tp ts <<< "$local_test_line"
+      local_test_passed="$tp"
+      local_test_summary="$ts"
+    fi
+
+    append_package "$(jq -cn \
+      --arg name "$pkg_name" \
+      --arg path "$pkg_path" \
+      --arg eco "$ecosystem" \
+      --argjson deps "${deps_json:-[]}" \
+      --argjson passed "$local_test_passed" \
+      --arg summary "$local_test_summary" \
+      '{name:$name, path:$path, ecosystem:$eco, skipped:false, dependencies:$deps, tests:{passed:$passed, summary:$summary}}'
+    )"
   done < "$REPORT_FILE.pending"
 fi
 
@@ -289,4 +392,4 @@ cat "$REPORT_FILE"
 
 # Cleanup
 rm -f "$REPORT_FILE" "$REPORT_FILE.pending"
-rm -rf "$OLD_VERSIONS_DIR"
+rm -rf "$OLD_VERSIONS_DIR" "$TEST_RESULTS_DIR"
