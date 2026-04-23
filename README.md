@@ -214,6 +214,24 @@ The subdirectory prefix on the tag (`hdbhelper/v...`) is required by Go for modu
 go get github.com/SAP-samples/hana-hdbext-promisfied-example/hdbhelper@v0.1.0
 ```
 
+### Releasing the Python package
+
+The Python package (`sap-hdbhelper-py`) is published to [PyPI](https://pypi.org/) using GitHub Actions with trusted publishers (OIDC — no stored API tokens).
+
+To release a new version of `hdbhelper-py`:
+
+1. Go to **Actions → Release Python Package → Run workflow**
+2. Enter a semver version (e.g. `0.1.0`)
+3. The workflow validates, tests, bumps `pyproject.toml`, builds sdist + wheel, commits, creates a `hdbhelper-py/v0.1.0` tag, and publishes to PyPI
+
+After publishing, anyone can install the package:
+
+```shell
+pip install sap-hdbhelper-py
+```
+
+> **First-time setup:** Before the first release, configure a [pending trusted publisher](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/) on PyPI for project `sap-hdbhelper-py`, owner `SAP-samples`, repo `hana-hdbext-promisfied-example`, workflow `release-python.yml`, environment `pypi`. Also create a GitHub Environment named `pypi` in repo Settings → Environments.
+
 ### Releasing the Node.js packages
 
 The Node.js packages (`sap-hdb-promisfied`, `sap-hdbext-promisfied`) are published manually to the npm registry. Before publishing, run the release checklist (`.github/prompts/release-checklist.prompt.md`) which covers version metadata, ESM/CJS parity, type declarations, tests, and documentation.

@@ -8,9 +8,26 @@ version = "0.1.0"
 description = "Python helper for SAP HANA — wraps hdbcli with environment resolution, SQL execution, and stored procedure support"
 requires-python = ">=3.12"
 license = "Apache-2.0"
+readme = "README.md"
+authors = [{ name = "Thomas Jung" }]
+keywords = ["sap", "hana", "hdbcli", "database", "cloud"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries",
+]
 dependencies = [
     "hdbcli",
 ]
+
+[project.urls]
+Homepage = "https://github.com/SAP-samples/hana-hdbext-promisfied-example"
+Repository = "https://github.com/SAP-samples/hana-hdbext-promisfied-example"
+Documentation = "https://github.com/SAP-samples/hana-hdbext-promisfied-example/tree/main/hdbhelper-py"
+Issues = "https://github.com/SAP-samples/hana-hdbext-promisfied-example/issues"
 
 [project.optional-dependencies]
 dev = [
