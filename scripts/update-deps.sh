@@ -48,12 +48,145 @@ skip_package() {
   append_package '{"name":"'"$name"'","path":"'"$path"'","ecosystem":"'"$ecosystem"'","skipped":true,"reason":"'"$reason"'","dependencies":[],"tests":{"passed":null,"summary":"skipped"}}'
 }
 
-# Ecosystem update functions will be added by subsequent tasks.
-# For now, output the empty report.
+# ---------------------------------------------------------------------------
+# Node.js ecosystem helpers
+# ---------------------------------------------------------------------------
+
+# snapshot_node_pkg <pkg_dir>
+# Prints "name=version_range" lines for all deps + devDeps in package.json.
+snapshot_node_pkg() {
+  local pkg_dir="$1"
+  local pkg_json="$pkg_dir/package.json"
+  if [ ! -f "$pkg_json" ]; then return; fi
+
+  if $HAS_JQ; then
+    jq -r '(.dependencies // {}) + (.devDependencies // {}) | to_entries[] | "\(.key)=\(.value)"' "$pkg_json"
+  else
+    # Fallback: extract lines that look like "  \"name\": \"version\"" from
+    # the dependencies / devDependencies blocks via grep+sed.
+    grep -E '"[^"]+"\s*:\s*"[^"]*"' "$pkg_json" \
+      | sed 's/.*"\([^"]*\)"\s*:\s*"\([^"]*\)".*/\1=\2/' \
+      | grep -v '"name"\|"version"\|"description"\|"main"\|"module"\|"types"\|"license"\|"author"\|"url"\|"type"\|"node"' \
+      || true
+  fi
+}
+
+# resolved_version_node <pkg_dir> <dep_name>
+# Returns the installed version from npm-shrinkwrap.json, or "unknown".
+resolved_version_node() {
+  local pkg_dir="$1"
+  local dep_name="$2"
+  local shrinkwrap="$pkg_dir/npm-shrinkwrap.json"
+  if [ ! -f "$shrinkwrap" ]; then echo "unknown"; return; fi
+
+  if $HAS_JQ; then
+    jq -r --arg dep "$dep_name" '.packages["node_modules/"+$dep].version // "unknown"' "$shrinkwrap"
+  else
+    echo "unknown"
+  fi
+}
+
+# update_node_package <name> <pkg_dir_relative>
+update_node_package() {
+  local name="$1"
+  local pkg_dir_relative="$2"
+  local pkg_dir="$REPO_ROOT/$pkg_dir_relative"
+
+  if ! has_tool npm; then
+    skip_package "$name" "$pkg_dir_relative" "node" "npm not found"
+    return
+  fi
+
+  echo "INFO: Updating Node.js package: $name" >&2
+
+  # Phase 1 — Snapshot current resolved versions
+  while IFS='=' read -r dep _range; do
+    [ -z "$dep" ] && continue
+    local old_ver
+    old_ver=$(resolved_version_node "$pkg_dir" "$dep")
+    save_old_version "${name}_${dep}" "$old_ver"
+  done < <(snapshot_node_pkg "$pkg_dir")
+
+  # Phase 2 — Run npm update
+  (cd "$pkg_dir" && npm update 2>&1) >&2 || echo "WARN: npm update returned non-zero for $name" >&2
+
+  # Phase 3 — Collect new versions, build deps JSON array
+  local deps_json="["
+  local first=true
+
+  while IFS='=' read -r dep _range; do
+    [ -z "$dep" ] && continue
+    local new_ver
+    new_ver=$(resolved_version_node "$pkg_dir" "$dep")
+    local old_ver
+    old_ver=$(get_old_version "${name}_${dep}")
+
+    # Determine whether this dep is a devDependency
+    local dep_type="production"
+    if $HAS_JQ; then
+      local in_dev
+      in_dev=$(jq -r --arg d "$dep" '.devDependencies[$d] // ""' "$pkg_dir/package.json")
+      [ -n "$in_dev" ] && dep_type="dev"
+    fi
+
+    $first || deps_json+=","
+    first=false
+    deps_json+="{\"name\":\"$dep\",\"type\":\"$dep_type\",\"old\":\"$old_ver\",\"new\":\"$new_ver\"}"
+  done < <(snapshot_node_pkg "$pkg_dir")
+
+  # Phase 4 — Detect pinned / manually-bumpable deps via npm outdated
+  local outdated_json
+  outdated_json=$(cd "$pkg_dir" && npm outdated --json 2>/dev/null) || true
+  outdated_json="${outdated_json:-{}}"
+
+  if $HAS_JQ && [ "$outdated_json" != "{}" ] && [ -n "$outdated_json" ]; then
+    while IFS= read -r dep; do
+      [ -z "$dep" ] && continue
+      local current latest
+      current=$(echo "$outdated_json" | jq -r --arg d "$dep" '.[$d].current // "unknown"')
+      latest=$(echo  "$outdated_json" | jq -r --arg d "$dep" '.[$d].latest  // "unknown"')
+      [ "$current" = "$latest" ] && continue
+
+      # Determine dep type
+      local dep_type="production"
+      local in_dev
+      in_dev=$(jq -r --arg d "$dep" '.devDependencies[$d] // ""' "$pkg_dir/package.json")
+      [ -n "$in_dev" ] && dep_type="dev"
+
+      $first || deps_json+=","
+      first=false
+      deps_json+="{\"name\":\"$dep\",\"type\":\"pinned\",\"old\":\"$current\",\"new\":\"$current\",\"latest\":\"$latest\",\"note\":\"pinned - manual bump available\"}"
+    done < <(echo "$outdated_json" | jq -r 'keys[]' 2>/dev/null || true)
+  fi
+
+  deps_json+="]"
+
+  # Write pending report line: name|path|ecosystem|deps_json
+  echo "${name}|${pkg_dir_relative}|node|${deps_json}" >> "$REPORT_FILE.pending"
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
 # --- Main ---
+> "$REPORT_FILE.pending"
+
+update_node_package "hdb" "hdb"
+update_node_package "hdbext" "hdbext"
+
+# Ecosystem update functions for Go and Python will be added by subsequent tasks.
+
+# Merge pending lines into the JSON report
+if $HAS_JQ && [ -f "$REPORT_FILE.pending" ]; then
+  while IFS='|' read -r pkg_name pkg_path ecosystem deps_json; do
+    [ -z "$pkg_name" ] && continue
+    append_package "{\"name\":\"$pkg_name\",\"path\":\"$pkg_path\",\"ecosystem\":\"$ecosystem\",\"skipped\":false,\"dependencies\":${deps_json:-[]}}"
+  done < "$REPORT_FILE.pending"
+fi
+
 cat "$REPORT_FILE"
 
 # Cleanup
-rm -f "$REPORT_FILE"
+rm -f "$REPORT_FILE" "$REPORT_FILE.pending"
 rm -rf "$OLD_VERSIONS_DIR"
