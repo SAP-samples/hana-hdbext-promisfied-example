@@ -1,6 +1,6 @@
 {
     "name": "sap-hdbext-promisfied",
-    "version": "2.202604.0",
+    "version": "2.202604.1",
     "description": "Promise wrapper for @sap/hdbext",
     "main": "./index.cjs",
     "exports": {
@@ -27,7 +27,7 @@
     "license": "Apache-2.0",
     "repository": {
         "type": "git",
-        "url": "https://github.com/SAP-samples/hana-hdbext-promisfied-example" 
+        "url": "https://github.com/SAP-samples/hana-hdbext-promisfied-example"
     },
     "dependencies": {
         "@sap/hdbext": "^8.1.13",
