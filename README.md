@@ -234,7 +234,16 @@ pip install sap-hdbhelper-py
 
 ### Releasing the Node.js packages
 
-The Node.js packages (`sap-hdb-promisfied`, `sap-hdbext-promisfied`) are published manually to the npm registry. Before publishing, run the release checklist (`.github/prompts/release-checklist.prompt.md`) which covers version metadata, ESM/CJS parity, type declarations, tests, and documentation.
+The Node.js packages (`sap-hdb-promisfied`, `sap-hdbext-promisfied`) are published to npm using GitHub Actions with [provenance](https://docs.npmjs.com/generating-provenance-statements) attestation.
+
+To release:
+
+1. Go to **Actions → Release Node.js Package → Run workflow**
+2. Select a package (`hdb`, `hdbext`, or `both`)
+3. Enter a semver version (e.g. `2.202604.1`)
+4. The workflow tests, generates type declarations, bumps `package.json` + `npm-shrinkwrap.json`, publishes with provenance, commits, creates `hdb/vX.Y.Z` and/or `hdbext/vX.Y.Z` tags, and pushes
+
+> **Setup:** Add an npm [automation access token](https://docs.npmjs.com/creating-and-viewing-access-tokens) as the `NPM_TOKEN` secret in repo Settings → Secrets and variables → Actions.
 
 ## Known Issues
 

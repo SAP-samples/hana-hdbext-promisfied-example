@@ -1,0 +1,104 @@
+name: Release Node.js Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to release'
+        required: true
+        type: choice
+        options:
+          - both
+          - hdb
+          - hdbext
+      version:
+        description: 'Semantic version to release (e.g. 2.202604.1)'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Validate version format
+        run: |
+          if ! echo "${{ inputs.version }}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Version must be in semver format (e.g. 2.202604.1)"
+            exit 1
+          fi
+
+      - name: Test hdb
+        if: inputs.package == 'hdb' || inputs.package == 'both'
+        working-directory: hdb
+        run: |
+          npm install --include=dev
+          npm test
+          npm run types
+
+      - name: Test hdbext
+        if: inputs.package == 'hdbext' || inputs.package == 'both'
+        working-directory: hdbext
+        run: |
+          npm install --include=dev
+          npm test
+          npm run types
+
+      - name: Bump and publish hdb
+        if: inputs.package == 'hdb' || inputs.package == 'both'
+        working-directory: hdb
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm version "${{ inputs.version }}" --no-git-tag-version
+          npm publish --provenance
+
+      - name: Bump and publish hdbext
+        if: inputs.package == 'hdbext' || inputs.package == 'both'
+        working-directory: hdbext
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm version "${{ inputs.version }}" --no-git-tag-version
+          npm publish --provenance
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          FILES=""
+          if [[ "${{ inputs.package }}" == "hdb" || "${{ inputs.package }}" == "both" ]]; then
+            FILES="$FILES hdb/package.json hdb/npm-shrinkwrap.json"
+          fi
+          if [[ "${{ inputs.package }}" == "hdbext" || "${{ inputs.package }}" == "both" ]]; then
+            FILES="$FILES hdbext/package.json hdbext/npm-shrinkwrap.json"
+          fi
+          git add $FILES
+          if [[ "${{ inputs.package }}" == "both" ]]; then
+            git commit -m "chore(hdb,hdbext): bump version to ${{ inputs.version }}"
+          else
+            git commit -m "chore(${{ inputs.package }}): bump version to ${{ inputs.version }}"
+          fi
+
+      - name: Create and push tags
+        run: |
+          TAGS=""
+          if [[ "${{ inputs.package }}" == "hdb" || "${{ inputs.package }}" == "both" ]]; then
+            TAG="hdb/v${{ inputs.version }}"
+            git tag -a "$TAG" -m "Release $TAG"
+            TAGS="$TAGS $TAG"
+          fi
+          if [[ "${{ inputs.package }}" == "hdbext" || "${{ inputs.package }}" == "both" ]]; then
+            TAG="hdbext/v${{ inputs.version }}"
+            git tag -a "$TAG" -m "Release $TAG"
+            TAGS="$TAGS $TAG"
+          fi
+          git push origin HEAD $TAGS
