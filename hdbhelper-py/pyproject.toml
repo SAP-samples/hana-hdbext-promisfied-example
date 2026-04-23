@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sap-hdbhelper-py"
-version = "0.1.0"
+version = "1.0.0"
 description = "Python helper for SAP HANA — wraps hdbcli with environment resolution, SQL execution, and stored procedure support"
 requires-python = ">=3.12"
 license = "Apache-2.0"
