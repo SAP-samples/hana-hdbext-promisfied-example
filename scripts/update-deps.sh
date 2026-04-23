@@ -166,6 +166,106 @@ update_node_package() {
 }
 
 # ---------------------------------------------------------------------------
+# Go ecosystem helpers
+# ---------------------------------------------------------------------------
+
+update_go_package() {
+  local name="hdbhelper" pkg_dir="$REPO_ROOT/hdbhelper"
+
+  if ! has_tool go; then
+    skip_package "$name" "hdbhelper" "go" "go not found"
+    return
+  fi
+
+  echo "INFO: Updating Go package: $name" >&2
+
+  # Phase 1: Snapshot — capture require lines from go.mod
+  local old_deps=""
+  if $HAS_JQ; then
+    old_deps=$(cd "$pkg_dir" && go list -m -json all 2>/dev/null | jq -rs '[.[] | select(.Main != true) | select(.Indirect != true) | {name: .Path, old: .Version}]') || old_deps="[]"
+  else
+    old_deps=$(grep -E '^\s+\S+ v' "$pkg_dir/go.mod" | awk '{print $1"="$2}') || old_deps=""
+  fi
+
+  # Phase 2: Update
+  (cd "$pkg_dir" && go get -u ./... 2>&1 && go mod tidy 2>&1) >&2 || echo "WARN: go get/tidy returned non-zero" >&2
+
+  # Capture new versions
+  local deps_json="["
+  local first=true
+  if $HAS_JQ; then
+    local new_deps
+    new_deps=$(cd "$pkg_dir" && go list -m -json all 2>/dev/null | jq -rs '[.[] | select(.Main != true) | select(.Indirect != true) | {name: .Path, version: .Version}]') || new_deps="[]"
+    deps_json=$(jq -cn --argjson old "${old_deps:-[]}" --argjson new "${new_deps:-[]}" '
+      [($old | map({(.name): .old}) | add // {}) as $omap |
+       $new[] |
+       {name: .name, old: ($omap[.name] // "unknown"), new: .version, type: "production"}]
+    ') || deps_json="[]"
+  else
+    while IFS='=' read -r dep ver; do
+      [ -z "$dep" ] && continue
+      local new_ver
+      new_ver=$(grep -E "^\s+${dep} " "$pkg_dir/go.mod" | awk '{print $2}') || new_ver="unknown"
+      $first || deps_json+=","
+      first=false
+      deps_json+="{\"name\":\"$dep\",\"old\":\"$ver\",\"new\":\"$new_ver\",\"type\":\"production\"}"
+    done <<< "$old_deps"
+    deps_json+="]"
+  fi
+
+  echo "$name|hdbhelper|go|$deps_json" >> "$REPORT_FILE.pending"
+}
+
+# ---------------------------------------------------------------------------
+# Python ecosystem helpers
+# ---------------------------------------------------------------------------
+
+update_python_package() {
+  local name="hdbhelper-py" pkg_dir="$REPO_ROOT/hdbhelper-py"
+
+  if ! has_tool pip; then
+    skip_package "$name" "hdbhelper-py" "python" "pip not found"
+    return
+  fi
+
+  if [ -z "${VIRTUAL_ENV:-}" ]; then
+    skip_package "$name" "hdbhelper-py" "python" "no active virtual environment (\$VIRTUAL_ENV is unset)"
+    return
+  fi
+
+  echo "INFO: Updating Python package: $name" >&2
+
+  # Phase 1: Snapshot — pip show for each known dep
+  local deps=("hdbcli" "pytest" "pytest-asyncio")
+  for dep in "${deps[@]}"; do
+    local ver
+    ver=$(pip show "$dep" 2>/dev/null | grep -i '^Version:' | awk '{print $2}') || ver="not installed"
+    save_old_version "py_${dep}" "$ver"
+  done
+
+  # Phase 2: Update
+  (cd "$pkg_dir" && pip install --upgrade -e ".[dev]" 2>&1) >&2 || echo "WARN: pip install returned non-zero for $name" >&2
+
+  # Capture new versions
+  local deps_json="["
+  local first=true
+  for dep in "${deps[@]}"; do
+    local new_ver
+    new_ver=$(pip show "$dep" 2>/dev/null | grep -i '^Version:' | awk '{print $2}') || new_ver="unknown"
+    local old_ver
+    old_ver=$(get_old_version "py_${dep}")
+    local dep_type="production"
+    if [ "$dep" != "hdbcli" ]; then dep_type="dev"; fi
+    $first || deps_json+=","
+    first=false
+    deps_json+="{\"name\":\"$dep\",\"old\":\"$old_ver\",\"new\":\"$new_ver\",\"type\":\"$dep_type\"}"
+  done
+  deps_json+="]"
+
+  echo "$name|hdbhelper-py|python|$deps_json" >> "$REPORT_FILE.pending"
+}
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -174,8 +274,8 @@ update_node_package() {
 
 update_node_package "hdb" "hdb"
 update_node_package "hdbext" "hdbext"
-
-# Ecosystem update functions for Go and Python will be added by subsequent tasks.
+update_go_package
+update_python_package
 
 # Merge pending lines into the JSON report
 if $HAS_JQ && [ -f "$REPORT_FILE.pending" ]; then
