@@ -1,1 +1,11 @@
-* @jung-thomas
+# Code owners for hana-hdbext-promisfied-example
+# Either of the listed owners can approve a pull request to satisfy
+# the "Require review from Code Owners" branch ruleset.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners
+
+# Default ownership: any maintainer can approve
+* @jung-thomas @rich-heilman
+
+# CI/CD and release plumbing — keep maintainers on the loop for these
+/.github/workflows/ @jung-thomas @rich-heilman
+/scripts/ @jung-thomas @rich-heilman
