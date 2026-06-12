@@ -15,6 +15,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      pull-requests: write
     defaults:
       run:
         working-directory: hdbhelper-py
@@ -48,22 +49,40 @@ jobs:
           pip install build
           python -m build
 
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: hdbhelper-py/dist/
+
       - name: Commit version bump
+        id: bump
         working-directory: .
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="release/hdbhelper-py-${{ inputs.version }}"
+          git checkout -b "$BRANCH"
           git add hdbhelper-py/pyproject.toml
-          git commit -m "chore(hdbhelper-py): bump version to ${{ inputs.version }}"
+          COMMIT_MSG="chore(hdbhelper-py): bump version to ${{ inputs.version }}"
+          git commit -m "$COMMIT_MSG"
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "title=$COMMIT_MSG" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag
         working-directory: .
         run: |
           TAG="hdbhelper-py/v${{ inputs.version }}"
           git tag -a "$TAG" -m "Release $TAG"
-          git push origin HEAD "$TAG"
+          git push origin "$TAG"
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: hdbhelper-py/dist/
+      - name: Open PR for version bump
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ steps.bump.outputs.branch }}" \
+            --title "${{ steps.bump.outputs.title }}" \
+            --body "Automated version bump from the **Release Python Package** workflow. The package has already been published to PyPI and the tag has been pushed; this PR records the version bump on \`main\`."
