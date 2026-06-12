@@ -23,6 +23,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
@@ -72,9 +73,12 @@ jobs:
           npm publish --provenance
 
       - name: Commit version bump
+        id: bump
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="release/${{ inputs.package }}-${{ inputs.version }}"
+          git checkout -b "$BRANCH"
           FILES=""
           if [[ "${{ inputs.package }}" == "hdb" || "${{ inputs.package }}" == "both" ]]; then
             FILES="$FILES hdb/package.json hdb/npm-shrinkwrap.json"
@@ -84,10 +88,14 @@ jobs:
           fi
           git add $FILES
           if [[ "${{ inputs.package }}" == "both" ]]; then
-            git commit -m "chore(hdb,hdbext): bump version to ${{ inputs.version }}"
+            COMMIT_MSG="chore(hdb,hdbext): bump version to ${{ inputs.version }}"
           else
-            git commit -m "chore(${{ inputs.package }}): bump version to ${{ inputs.version }}"
+            COMMIT_MSG="chore(${{ inputs.package }}): bump version to ${{ inputs.version }}"
           fi
+          git commit -m "$COMMIT_MSG"
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "title=$COMMIT_MSG" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tags
         run: |
@@ -102,4 +110,14 @@ jobs:
             git tag -a "$TAG" -m "Release $TAG"
             TAGS="$TAGS $TAG"
           fi
-          git push origin HEAD $TAGS
+          git push origin $TAGS
+
+      - name: Open PR for version bump
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ steps.bump.outputs.branch }}" \
+            --title "${{ steps.bump.outputs.title }}" \
+            --body "Automated version bump from the **Release Node.js Package** workflow. Packages have already been published to npm and tags have been pushed; this PR records the version bump on \`main\`."
