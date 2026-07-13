@@ -53,7 +53,7 @@ db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA
 	})
 ```
 
-Or better yet if you are running Node.js 8.x or higher you can use the new AWAIT feature and the code is even more streamlined:
+Or better yet, using the async/await syntax (supported in all current Node.js versions) the code is even more streamlined:
 
 ```JavaScript
 try {
@@ -116,7 +116,7 @@ objectName(name)
 
 ## Requirements / Download and Installation
 
-* Install any supported version of Node.js on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
+* Install a supported version of Node.js (20.x, 22.x, 24.x, or 26.x) on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 
 * Install the code sample as a reusable Node.js module
 
