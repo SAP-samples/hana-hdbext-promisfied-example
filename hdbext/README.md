@@ -53,7 +53,7 @@ db.preparePromisified(`SELECT SESSION_USER, CURRENT_SCHEMA
 	})
 ```
 
-Or better yet if you are running Node.js 8.x or higher you can use the new AWAIT feature and the code is even more streamlined:
+Or better yet, using the async/await syntax (supported in all current Node.js versions) the code is even more streamlined:
 
 ```JavaScript
 try {
@@ -115,7 +115,7 @@ objectName(name)
 
 ## Requirements / Download and Installation
 
-* Install Node.js version 12.x or 14.x on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
+* Install a supported version of Node.js (18.18.0 or higher; 20.x, 22.x, 24.x, and 26.x are tested) on your development machine [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 
 * @sap Node.js packages have moved from https://npm.sap.com to the default registry https://registry.npmjs.org. As future versions of @sap modules are going to be published only there, please make sure to adjust your registry with:
 
