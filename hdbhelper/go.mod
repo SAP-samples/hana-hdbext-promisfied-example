@@ -4,4 +4,4 @@ go 1.25.0
 
 require github.com/SAP/go-hdb v1.16.12
 
-require golang.org/x/text v0.38.0 // indirect
+require golang.org/x/text v0.40.0 // indirect

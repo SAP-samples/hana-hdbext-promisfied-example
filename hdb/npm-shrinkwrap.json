@@ -23,7 +23,7 @@
                 "typescript": "~6.0.0"
             },
             "engines": {
-                "node": "^20.0.0  || ^22.0.0 || ^24.0.0"
+                "node": "^20.0.0  || ^22.0.0 || ^24.0.0 || ^26.0.0"
             }
         },
         "node_modules/@isaacs/cliui": {
@@ -94,9 +94,9 @@
             "license": "MIT"
         },
         "node_modules/@types/node": {
-            "version": "25.9.4",
-            "resolved": "https://registry.npmjs.org/@types/node/-/node-25.9.4.tgz",
-            "integrity": "sha512-dszCsrKb5U7ZsVZBWiHFklTloVl0mSEnWH/iZXfZUlI4rzCUnsvGmgqfuVRHL54ugE7/wRuxEIXRa2iMZ+BG6g==",
+            "version": "25.9.5",
+            "resolved": "https://registry.npmjs.org/@types/node/-/node-25.9.5.tgz",
+            "integrity": "sha512-OScDchr2fwuUmWdf4kZ9h7PcJiYDVInhJizG/biAq3cAvqwYktuy/TYGGdZNMtNTFUP7rnb0NU4TUdm82kt4Rg==",
             "dev": true,
             "license": "MIT",
             "dependencies": {
@@ -163,9 +163,9 @@
             "license": "MIT"
         },
         "node_modules/brace-expansion": {
-            "version": "2.1.1",
-            "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.1.1.tgz",
-            "integrity": "sha512-WR1cURNjuvBLMZBMbqM0UoE+WAfdUcEV1ccD8PVBVOI+Z3ND4+SZbN8RsfT2bMuG1qwz5RFvPukSZm5fF2D5eA==",
+            "version": "2.1.2",
+            "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.1.2.tgz",
+            "integrity": "sha512-w5JZcKgdhDOgOwm8H+KgbosopHMuGcl6qbulwjtz3SM7I7P3yW1eAjzMPLrIE+NQ9vjgANKHWeMHnrT0OXW1oA==",
             "dev": true,
             "license": "MIT",
             "dependencies": {
@@ -658,9 +658,9 @@
             }
         },
         "node_modules/js-yaml": {
-            "version": "4.2.0",
-            "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-4.2.0.tgz",
-            "integrity": "sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==",
+            "version": "4.3.0",
+            "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-4.3.0.tgz",
+            "integrity": "sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==",
             "dev": true,
             "funding": [
                 {
@@ -922,9 +922,9 @@
             "license": "MIT"
         },
         "node_modules/serialize-javascript": {
-            "version": "7.0.6",
-            "resolved": "https://registry.npmjs.org/serialize-javascript/-/serialize-javascript-7.0.6.tgz",
-            "integrity": "sha512-ATTK5Q4gFVg0YDp1my2vqygyvhcklD/UV5GIlYHooGTn/NogJqIzpetkD6E5kmuVULqz/S9inUL25XcAgDRJQg==",
+            "version": "7.0.7",
+            "resolved": "https://registry.npmjs.org/serialize-javascript/-/serialize-javascript-7.0.7.tgz",
+            "integrity": "sha512-YAy8Od6KV+uuwUuU50np8fGB/Aues6Y0nAhA9y/hId74PlKUcme4pXcBD46NWKr1Q4osN/iseZ17YqO1XfmI8g==",
             "dev": true,
             "license": "BSD-3-Clause",
             "engines": {
