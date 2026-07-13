@@ -2,6 +2,30 @@
 
 All notable dependency updates to this project are documented in this file.
 
+## 2026-07-13
+
+### Dependencies Updated
+
+#### hdb/
+- `@types/node` 25.9.4 -> 25.9.5
+
+#### hdbext/
+- `@sap/hdbext` 8.1.13 -> 8.1.14
+- `@types/node` 25.9.4 -> 25.9.5
+
+#### hdbhelper/
+- `golang.org/x/text` (indirect) 0.38.0 -> 0.40.0
+
+### Test Results
+- hdb: passed (20 passing, 24s)
+- hdbext: passed (20 passing, 18s)
+- hdbhelper: passed (`go vet` clean, `go test` ok, 8s) — initial run hit a transient Windows "Access is denied" on the freshly-built test binary (AV/SmartScreen); a retry passed cleanly.
+- hdbhelper-py: skipped (no active virtual environment — `$VIRTUAL_ENV` unset)
+
+### Notes
+- No open Dependabot alerts; `npm audit` reports 0 vulnerabilities in both Node packages.
+- `@sap/hdbext@8.1.14` and `@sap/xsenv@6.2.1` emit EBADENGINE warnings under Node 26 (declared engines cap at Node 24). Harmless at runtime, but relevant on the `feat/node-26-support` branch.
+
 ## 2026-06-26
 
 ### Security
