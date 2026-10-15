@@ -1,5 +1,5 @@
 // Warn when index.js is edited without index.cjs (or vice versa)
-const input = JSON.parse(process.env.CLAUDE_TOOL_INPUT || '{}')
+const input = JSON.parse(require('fs').readFileSync(0, 'utf8') || '{}').tool_input || {}
 const filePath = (input.file_path || '').replace(/\\/g, '/')
 
 const match = filePath.match(/\/(hdb|hdbext)\/(index)\.(js|cjs)$/)
