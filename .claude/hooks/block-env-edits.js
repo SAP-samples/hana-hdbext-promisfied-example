@@ -1,5 +1,5 @@
 // Block edits to credential/environment files
-const input = JSON.parse(process.env.CLAUDE_TOOL_INPUT || '{}')
+const input = JSON.parse(require('fs').readFileSync(0, 'utf8') || '{}').tool_input || {}
 const filePath = (input.file_path || '').replace(/\\/g, '/')
 
 if (/default-env.*\.json|\/\.env$|\/\.env\./.test(filePath)) {
